@@ -1,0 +1,15 @@
+<actor-template>
+
+  <actor-chain id="selectSite">
+    <form id="changeSiteFormHandler">
+      <input name="inputParameters.siteId" value="${(siteId != null) ? siteId : param.siteId}"/>
+    </form>
+  </actor-chain>
+
+  <!-- return the site that has been selected -->
+  <actor-chain id="selectSite-success">
+    <component id="envTools" name="/atg/commerce/custsvc/environment/CSREnvironmentTools" component-var="envTools">
+      <output id="currentSite" name="currentSite" value="${envTools.environmentTools.currentSite}" filter-id="getSites"/>
+    </component>
+  </actor-chain>
+ </actor-template>

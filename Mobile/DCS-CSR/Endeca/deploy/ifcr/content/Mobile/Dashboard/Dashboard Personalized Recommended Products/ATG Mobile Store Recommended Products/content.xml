@@ -1,0 +1,10 @@
+<ContentItem type="MainContent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://endeca.com/schema/content/2008">
+  <TemplateId>ProductSpotlight-ATGTargeter</TemplateId>
+  <Name>Recommended Products (ATG Mobile Store) - ATGTargeter</Name>
+  <Property name="componentPath">
+    <String>ProductCatalog/MobilePromotionChild1</String>
+  </Property>
+  <Property name="itemCount">
+    <String>12</String>
+  </Property>
+</ContentItem>

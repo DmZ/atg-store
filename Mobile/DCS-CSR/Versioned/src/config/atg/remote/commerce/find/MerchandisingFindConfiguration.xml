@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- CRS customizations for merchandising find configuration -->
+
+<find-configuration site-filtering="true">
+
+  <!-- Site Announcements Find View -->
+  <asset-family id="storeAnnouncements" site-filtering="false">
+
+    <display-name-resource>node.storeAnnouncements.label</display-name-resource>
+    <result-list page-size="100"/>
+    <default-asset-type>storeAnnouncement</default-asset-type>
+
+    <asset-type id="storeAnnouncement" site-filtering="false">
+      <display-name-resource>node.storeAnnouncements.label</display-name-resource>
+      <repository-path>/atg/store/stores/StoreTextRepository</repository-path>
+      <repository-item-type>storeAnnouncement</repository-item-type>
+    </asset-type>
+
+  </asset-family>
+
+</find-configuration>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Versioned/config/atg/remote/commerce/find/MerchandisingFindConfiguration.xml#1 $$Change: 850446 $-->

@@ -1,0 +1,50 @@
+<ContentItem type="MainContent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://endeca.com/schema/content/2008">
+  <TemplateId>HorizontalRecordSpotlight</TemplateId>
+  <Name>Spotlight Records</Name>
+  <Property name="title">
+    <String/>
+  </Property>
+  <Property name="maxNumRecords">
+    <String>12</String>
+  </Property>
+  <Property name="recordSelection">
+    <Item class="com.endeca.infront.cartridge.RecordSpotlightSelection" xmlns="http://endeca.com/schema/xavia/2010">
+      <Property name="augment">false</Property>
+      <Property name="filterState">
+        <Item class="com.endeca.infront.cartridge.support.SpotlightFilterState">
+          <Property name="navigationDimLocations">
+            <List>
+              <Item class="com.endeca.infront.cartridge.support.DimLocationBean">
+                <Property name="dimensionId">10011</Property>
+                <Property name="dimensionName">product.category</Property>
+                <Property name="multiSelect">None</Property>
+                <Property name="dimVal">
+                  <Item class="com.endeca.infront.cartridge.support.DimValBean">
+                    <Property name="id">10100</Property>
+                    <Property name="name">Gift Shop</Property>
+                    <Property name="leaf">false</Property>
+                    <Property name="navigable">true</Property>
+                  </Item>
+                </Property>
+                <Property name="ancestors">
+                  <List/>
+                </Property>
+              </Item>
+            </List>
+          </Property>
+          <Property name="navigationFilters">
+            <List>
+              <String>10100</String>
+            </List>
+          </Property>
+        </Item>
+      </Property>
+    </Item>
+  </Property>
+  <Property name="showSeeAllLink">
+    <Boolean>false</Boolean>
+  </Property>
+  <Property name="seeAllLinkText">
+    <String>See All</String>
+  </Property>
+</ContentItem>

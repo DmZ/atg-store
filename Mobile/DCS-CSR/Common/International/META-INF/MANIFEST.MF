@@ -1,0 +1,5 @@
+ATG-Product: The Mobile Commerce Store DCS-CSR module
+Manifest-Version: 1.0
+ATG-Config-Path: config/config.jar
+ATG-Class-Path: lib/classes.jar
+ATG-Required: Store.Mobile.DCS-CSR.Common

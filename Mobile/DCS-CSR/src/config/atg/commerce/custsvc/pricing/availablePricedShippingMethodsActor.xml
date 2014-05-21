@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template default-chain-id="getAvailablePricedShippingMethods" xsi:noNamespaceSchemaLocation="http://www.atg.com/xsds/actorChain_1.0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  
+  <!-- returns available priced shipping methods for a shipping group in the cart, and online/location inventory availability -->
+  <!-- input: shippingGroupId, locationId -->
+  <actor-chain id="getPricedShippingMethodsWithAvailabilityForShippingGroup" transaction="TX_SUPPORTS">
+    <component id="cart" name="/atg/commerce/custsvc/order/ShoppingCart" component-var="cart"/>
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile"/>
+    <component id="envTools" name="/atg/commerce/custsvc/environment/CSREnvironmentTools" component-var="envTools"/>
+    <droplet id="forEach" name="/atg/dynamo/droplet/ForEach" var="forEach">
+      <input name="array" value="${cart.current.shippingGroups}"/>
+      <oparam name="output">
+        <!-- match shippingGroupId -->
+        <droplet id="compare" name="/atg/dynamo/droplet/Compare" var="compareDroplet">
+          <input name="obj1" value="${forEach.element.id}" />
+          <input name="obj2" value="${param.shippingGroupId}" />
+          <oparam name="equal">
+            <!-- inventory availability -->
+            <actor id="inventoryActor" name="/atg/commerce/inventory/InventoryActor" 
+                   chain-id="getAvailabilityForShippingGroup" return-model-var="inventoryActorOutput">
+              <input name="shippingGroup" value="${forEach.element}" />
+              <input name="locationId" value="${param.locationId}" />
+              <output id="availability" add-map-children="true" name="${forEach.element.id}" value="${inventoryActorOutput}" />
+            </actor>
+          
+            <!-- only price if it's a hard good shipping group -->
+            <droplet id="compare" name="/atg/dynamo/droplet/Compare" var="compareDroplet">
+              <input name="obj1" value="${forEach.element.shippingGroupClassType}" />
+              <input name="obj2" value="hardgoodShippingGroup" />
+              <oparam name="equal">
+                <droplet id="availablePricedShippingMethodsDroplet" name="/atg/commerce/custsvc/pricing/AvailablePricedShippingMethodsDroplet"
+                  var="availablePricedShippingMethodsDropletParamStack">
+                  <input name="order" value="${cart.current}" />
+                  <input name="profile" value="${profile}" />
+                  <input name="pricingModels" value="${envTools.currentOrderPricingModelHolder.shippingPricingModels}" />
+                  <input name="shippingGroup" value="${forEach.element}" />
+    
+                  <oparam name="output">
+                    <output id="availablePricedShippingMethods" name="${forEach.element.id}.shippingMethods"
+                      value="${availablePricedShippingMethodsDropletParamStack.availablePricedShippingMethods}" />
+                  </oparam>
+                </droplet>
+              </oparam>
+              <oparam name="default">
+                <!-- list available shipping methods (no price) -->
+                <droplet id="availableShippingMethodsDroplet"
+                  name="/atg/commerce/pricing/AvailableShippingMethods" var="availableShippingMethodsDropletParamStack">
+                  <input name="shippingGroup" value="${forEach.element}" />
+                  <oparam name="output">
+                    <output id="availableShippingMethods" name="${forEach.element.id}.shippingMethods"
+                      value="${availableShippingMethodsDropletParamStack.availableShippingMethods}" />
+                  </oparam>
+                </droplet>
+              </oparam>
+            </droplet>
+          </oparam>
+        </droplet>
+      </oparam>
+    </droplet>  
+  </actor-chain>
+</actor-template>
+<!-- @version $Id: //application/DCS-CSR/version/10.2/src/config/atg/commerce/custsvc/pricing/availablePricedShippingMethodsActor.xml#1 
+  $$Change: 840870 $ -->

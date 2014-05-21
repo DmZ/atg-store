@@ -1,0 +1,12 @@
+<actor-template>
+
+  <actor-chain id="productPriceRanges">
+    <droplet id="priceRangeDroplet">
+      <!-- Sometimes the profile's pricelist properties are not populated, so override the base XML in order to use the pricelists defined in
+           the pricelist holder. -->
+      <input name="priceList" value="${nucleus['/atg/commerce/custsvc/environment/CurrentPriceListHolder'].currentPriceList}" />
+      <input name="salePriceList" value="${nucleus['/atg/commerce/custsvc/environment/CurrentPriceListHolder'].currentSalePriceList}" />
+    </droplet>
+  </actor-chain>
+</actor-template>
+

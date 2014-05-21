@@ -1,0 +1,4 @@
+ATG-Product: The Mobile Commerce Store DCS-CSR Versioned module
+Manifest-Version: 1.0
+ATG-Required: Store.Mobile.DCS-CSR.Common.International Store.Mobile.DCS-CSR.Versioned
+

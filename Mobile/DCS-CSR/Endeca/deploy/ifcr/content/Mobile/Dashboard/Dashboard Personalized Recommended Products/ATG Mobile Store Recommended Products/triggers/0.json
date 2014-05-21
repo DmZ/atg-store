@@ -1,0 +1,5 @@
+{
+    "sling:resourceType": "endeca/trigger",
+    "inherit": "TRUE",
+    "jcr:primaryType": "endeca:unstructured"
+}

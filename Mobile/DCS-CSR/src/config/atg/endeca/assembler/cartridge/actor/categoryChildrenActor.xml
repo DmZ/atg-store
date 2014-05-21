@@ -1,0 +1,9 @@
+<actor-template>
+  <actor-chain id="categoryChildren">
+      <!-- Override the actor path so that the service version is used -->
+      <actor id="getCategory" name="/atg/commerce/custsvc/catalog/ProductCatalogActor">
+      </actor>          
+  </actor-chain> 
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/MobileCommerce/dev/10.2/server/MobileCommerce/config/atg/store/mobile/rest/actors/profile.xml#1 
+  $$Change: 822384 $ -->

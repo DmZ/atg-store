@@ -1,0 +1,39 @@
+<%--
+  Set a resource bundle from the site context or configuration file.
+  
+  Required Parameters:
+    None
+    
+  Optional Parameters:
+    None
+ --%>
+<dsp:importbean var="currentStoreConfiguration" bean="/atg/store/StoreConfiguration"/>
+<dsp:importbean var="originatingRequest" bean="/OriginatingRequest" />
+<dsp:importbean bean="/atg/multisite/SiteContext"/>
+
+<dsp:getvalueof var="resourceBundle" bean="SiteContext.site.resourceBundle"/>
+<dsp:getvalueof var="bundleLocale" value="${originatingRequest.requestLocale.locale}"/> 
+
+<%--
+  If the request locale is null and DynamoHttpServletRequest.generateRequestLocales
+  is false (non International module) then the previously obtained locale may be
+  null. In this case use the RequestLocale component directly.
+--%>
+<c:if test="${empty bundleLocale}">
+  <dsp:importbean bean="/atg/dynamo/servlet/RequestLocale"/>
+  <dsp:getvalueof var="bundleLocale" bean="RequestLocale.locale"/>
+</c:if>
+
+<%-- 
+  Set the resource bundle location from the site context. If it doesn't
+  exist in the site context, get it from configuration file. 
+--%>
+<c:choose>
+  <c:when test="${not empty resourceBundle}">
+    <dsp:layerBundle basename="${resourceBundle}" locale="${bundleLocale}"/>
+  </c:when>
+  <c:otherwise>
+    <dsp:layerBundle basename="${currentStoreConfiguration.defaultResourceBundle}" locale="${bundleLocale}"/>
+  </c:otherwise>
+</c:choose>
+<%-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Storefront/j2ee/store.war/includes/context.jspf#7 $$Change: 814262 $--%>

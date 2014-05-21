@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gsa-template>
+
+  <item-descriptor name="storeAnnouncement"
+                   display-name-resource="storeAnnouncement"
+                   display-property="title">
+    <attribute name="resourceBundle" value="atg.projects.store.stores.StoreTextRepositoryTemplateResources"/>
+    <attribute name="flexIconResource" value="item.longStoreText.iconSmall"/>
+    <attribute name="largeFlexIconResource" value="item.longStoreText.iconLarge"/>
+
+    <!-- Additional properties for an announcement store text item -->
+    <table name="crs_store_ancmnt" type="primary" id-column-names="id">
+      <property name="title"
+                column-name="title"
+                data-type="string"
+                category-resource="categoryStoreAnnouncement"
+                display-name-resource="title">
+        <attribute name="propertySortPriority" value="100"/>
+      </property>
+
+      <property name="content"
+                column-name="content"
+                data-type="big string"
+                category-resource="categoryStoreAnnouncement"
+                display-name-resource="content">
+        <attribute name="propertySortPriority" value="110"/>
+      </property>  
+
+      <property name="creationTime" 
+                column-names="creation_time" 
+                data-type="timestamp"      
+                display-name-resource="creationTime" 
+                category-resource="categoryStoreAnnouncement">
+        <attribute name="propertySortPriority" value="130"/>
+        <attribute name="useNowForDefault" value="true"/>
+        <attribute name="uiwritable" value="false"/>
+      </property>
+
+      <property name="enabled"           
+                column-names="enabled"          
+                data-type="boolean"        
+                category-resource="categoryStoreAnnouncement" 
+                display-name-resource="enabled" 
+                default="true">
+              <attribute name="propertySortPriority" value="140"/>
+      </property> 
+
+    </table>
+    
+    <!-- The list of stores to which the announcement applies -->
+    <table name="crs_store_ancmnt_sts"
+           type="multi"
+           id-column-names="announcement_id">
+      <property name="stores"
+                data-type="set" 
+                display-name-resource="storeList"
+                repository="/atg/commerce/locations/LocationRepository"
+                component-item-type="location"
+                category-resource="categoryStoreAnnouncement"
+                column-name="store_id">
+        <attribute name="propertySortPriority" value="120"/>
+      </property>
+
+    </table>           
+  </item-descriptor>
+
+</gsa-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Common/config/atg/store/stores/storeText.xml#6 $$Change: 847017 $-->

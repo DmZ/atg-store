@@ -1,0 +1,104 @@
+<actor-template>
+  <actor-chain id="changeViewOrder-success" transaction="TX_SUPPORTS">
+    <component id="formHandler" name="/atg/commerce/custsvc/order/ViewOrderFormHandler" component-var="formHandler">
+      <output id="result" name="result" value="${formHandler.CSREnvironmentTools.viewOrder}" filter-id="detailed"/>
+    </component>
+  </actor-chain>
+  <actor-chain id="viewOrders" transaction="TX_SUPPORTS">
+    <droplet id="forEach" name="/atg/dynamo/droplet/ForEach" var="orderIds">
+	  <input name="array" value="${param.orderIds}">
+	    <tag-converter class-name="atg.droplet.ArrayTagConverter"/>
+	  </input>
+	  <oparam name="output">
+	    <form id="viewOrderFormHandler" name="/atg/commerce/custsvc/order/ViewOrderFormHandler"
+          handle="changeViewOrder" var="viewOrderFormHandler">
+          <input name="viewOrderId" value="${orderIds.element}" />
+          <input name="errorURL" value="${errorURL != null ? errorURL : '/model/atg/commerce/custsvc/order/ViewOrderActor/changeViewOrder-error'}" />
+          <input name="successURL" value="${successURL != null ? successURL : '/model/atg/commerce/custsvc/order/ViewOrderActor/changeViewOrder-success'}" />
+          <output id="result" name="result[${orderIds.index}]" value="${viewOrderFormHandler.CSREnvironmentTools.viewOrder}" filter-id="detailed"/>
+        </form>
+	  </oparam>
+	</droplet>
+  </actor-chain> 
+  <actor-chain id="orderHistory" transaction="TX_SUPPORTS">
+    <droplet id="adminOrderLookupDroplet" name="/atg/commerce/custsvc/order/MobileCSROrderLookup"  var="orderLookupParamStack" >
+      <input name="userId"
+		value="${nucleus['/atg/userprofiling/ActiveCustomerProfile'].repositoryId}" />
+	  <input name="state"
+		value="closed" />
+	  <input name="sortBy"
+		value="submittedDate" />
+	  <input name="sortAscending"
+		value="false" />
+	  <input name="numOrders" value="${param.howMany}" />
+		<oparam name="output">
+	      <output id="result" name="result"
+			value="${orderLookupParamStack.result}" filter-id="orderDetails" />
+		</oparam>
+	  </droplet>
+  </actor-chain> 
+
+  <actor-chain id="savedOrders" transaction="TX_SUPPORTS">
+
+    <!-- Resolve all of the components needed for the below loop.  This prevents them being resolved on each loop iteration. -->
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile" />
+    <component id="pricingModels" name="/atg/commerce/custsvc/pricing/CustomerPricingModels" component-var="pricingModels" />
+    <component id="requestLocale" name="/atg/dynamo/servlet/RequestLocale" component-var="requestLocale" />
+
+    <droplet id="adminOrderLookupDroplet" name="/atg/commerce/custsvc/order/MobileCSROrderLookup"  var="orderLookupParamStack" >
+      <input name="userId"
+		value="${profile.repositoryId}" />
+	  <input name="state"
+		value="incomplete" />
+	  <input name="sortBy"
+		value="submittedDate" />
+	  <input name="sortAscending"
+		value="false" />
+	  <input name="numOrders" value="${param.howMany}" />
+      <oparam name="output">
+        <droplet id="forEach" name="/atg/dynamo/droplet/ForEach" var="ForEach">
+          <input name="array" value="${orderLookupParamStack.result}" />
+          <oparam name="output">
+            <component id="pricingTools" name="/atg/commerce/pricing/PricingTools" method="priceOrderTotal">
+		      <input name="order" class-name="atg.commerce.order.Order" index="0" value="${ForEach.element}"/>
+			  <input name="pricingModelHolder" class-name="atg.commerce.pricing.PricingModelHolder" index="1" value="${pricingModels}"/>
+	          <input name="locale" class-name="java.util.Locale" index="2" value="${requestLocale.locale}"/>
+	  	      <input name="profile" class-name="atg.repository.RepositoryItem" index="3" value="${profile}"/>
+		      <input name="parameters" class-name="java.util.Map" index="4" value="priceList=listPrices,salePriceList=salePrices"> 
+			    <tag-converter class-name="atg.droplet.MapTagConverter"/>
+			  </input>
+		    </component>
+			<output id="result" name="result[${ForEach.index}]" value="${ForEach.element}" filter-id="orderDetails" />
+          </oparam>
+        </droplet>
+      </oparam>
+    </droplet>
+  </actor-chain> 
+
+  <actor-chain id="loadAllOrders" transaction="TX_SUPPORTS">
+    <actor id="shoppingCart" name="/atg/commerce/custsvc/order/ShoppingCartActor" chain-id="detailed" return-model-var="model">
+      <output id="shoppingCart" name="shoppingCart" value="${model.order}"/>
+    </actor>
+
+    <actor id="savedOrders" name="/atg/commerce/custsvc/order/ViewOrderActor" chain-id="savedOrders" return-model-var="model">
+      <input name="howMany" value="10" />
+      <output id="savedOrders" name="savedOrders" value="${model.result}"/>
+    </actor>
+
+    <actor id="orderHistory" name="/atg/commerce/custsvc/order/ViewOrderActor" chain-id="orderHistory" return-model-var="model">
+      <input name="howMany" value="10" />
+      <output id="orderHistory" name="orderHistory" value="${model.result}"/>
+    </actor>
+  </actor-chain>
+
+  <actor-chain id="loadShoppingCartAndSavedOrders" transaction="TX_SUPPORTS">
+    <actor id="shoppingCart" name="/atg/commerce/custsvc/order/ShoppingCartActor" chain-id="detailed" return-model-var="model">
+      <output id="shoppingCart" name="shoppingCart" value="${model.order}"/>
+    </actor>
+
+    <actor id="savedOrders" name="/atg/commerce/custsvc/order/ViewOrderActor" chain-id="savedOrders" return-model-var="model">
+      <input name="howMany" value="10" />
+      <output id="savedOrders" name="savedOrders" value="${model.result}"/>
+    </actor>
+  </actor-chain> 
+</actor-template>

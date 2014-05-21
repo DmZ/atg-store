@@ -1,0 +1,14 @@
+<ContentItem type="MainContent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://endeca.com/schema/content/2008">
+  <TemplateId>MediaBanner</TemplateId>
+  <Name>Default Media Banner - ATG Mobile Home</Name>
+  <Property name="imageURL">
+    <String>/crsdocroot/content/mobile/images/ASADashboard_ATGMobileHome_en.png</String>
+  </Property>
+  <Property name="link">
+    <Item class="com.endeca.infront.cartridge.model.LinkBuilder" xmlns="http://endeca.com/schema/xavia/2010">
+      <Property name="path"/>
+      <Property name="linkType"/>
+      <Property name="queryString"/>
+    </Item>
+  </Property>
+</ContentItem>

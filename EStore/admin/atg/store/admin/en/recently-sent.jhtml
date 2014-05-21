@@ -1,0 +1,53 @@
+<!-- Displays list of recently sent emails -->
+
+<importbean bean="/atg/dynamo/droplet/ForEach"/>
+<importbean bean="/atg/store/email/RecentlySentList"/>
+<importbean bean="/atg/dynamo/droplet/multisite/GetSiteDroplet"/>
+<importbean bean="/atg/store/droplet/DisplayLanguagesDroplet" />
+<importbean bean="/atg/dynamo/droplet/IsEmpty">
+<importbean bean="/atg/dynamo/droplet/Switch"/>
+<importbean bean="/atg/store/util/DocumentLinksService"/>
+
+<!-- don't display list if it is empty -->
+
+<droplet bean="IsEmpty">
+  <param name="value" value="bean:RecentlySentList.sentList">
+    
+  <oparam name="false">
+    
+    <div id="recentlySent">
+      <h3>Recently Sent</h3>
+      
+      <ul>
+        <droplet name="ForEach">
+          <param name="array" value="bean:RecentlySentList.sentList" />
+            <oparam name="output">
+              <li>
+                <a href=`new String("email.jhtml?template=" + request.getParameter("element.menuItem") + "&emailId=" + request.getParameter("index"))`>
+                  <span><valueof param="element.timestamp"/></span>
+                  <span><strong><valueof param="element.type"/></strong></span>
+                  <span>
+                    <droplet name="GetSiteDroplet">
+                      <param name="siteId" value="param:element.parameters.siteId"/>
+                      <oparam name="output">
+                        <valueof param="site.name"/>
+                      </oparam>
+                    </droplet>
+                    <droplet bean="Switch">
+                      <param name="value" value="bean:DocumentLinksService.international">
+                      <oparam name="true">
+                        - <valueof param="element.language"/>
+                      </oparam>
+                    </droplet>
+                  </span>
+                
+                  <valueof param="element.parameters.recipientEmail"/>
+                </a>
+              </li>  
+            </oparam>
+          </droplet>
+        </ul>
+      </div>
+  </oparam>
+</droplet>
+<java>/* @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/EStore/admin/atg/store/admin/en/recently-sent.jhtml#2 $$Change: 814776 $*/</java>

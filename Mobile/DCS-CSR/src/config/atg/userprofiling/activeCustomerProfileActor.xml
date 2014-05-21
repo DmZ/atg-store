@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template default-chain-id="summary"
+  xsi:noNamespaceSchemaLocation="http://www.atg.com/xsds/actorChain_1.0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <actor-chain id="detailed" transaction="TX_SUPPORTS">
+    <!--  CSC application uses Service profile to get the active profile information. This forwarding the request to the  ServiceUIProfileActor -->
+    <actor id="viewCustomer" name="/atg/svc/agent/ui/formhandlers/ServiceUIProfileActor" chain-id="viewCustomer" return-model-var="model">
+      <input name="customerId" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile'].repositoryId}"/>
+    </actor>
+  </actor-chain>
+
+  <actor-chain id="summary" transaction="TX_SUPPORTS">
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile">
+      <output id="profile" name="profile" value="${profile.dataSource}" filter-id="summary"/>
+      <output id="anonymous" name="profile.anonymous" value="${profile.transient}"/>
+    </component>
+  </actor-chain>
+  
+  <actor-chain id="addresses">
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile"/>
+    <output id="addresses" name="addresses" value="${profile.allSecondaryAddresses}" filter-id="summary"/>
+    <output id="defaultShippingAddressId" name="defaultShippingAddressId" value="${profile.shippingAddress.id}"/>
+    <output id="creditCards" name="creditCards" value="${profile.dataSource.creditCards}" filter-id="address"/>
+  </actor-chain>
+  
+  <actor-chain id="creditCards">
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile"/>
+    <output id="defaultCreditCardId" name="defaultCreditCardId" value="${profile.defaultCreditCard.id}"/>
+    <output id="creditCards" name="creditCards" value="${profile.dataSource.creditCards}" filter-id="summary"/>
+  </actor-chain>
+  
+  <actor-chain id="isAnonShopper">
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile"/>
+    <output id="anonShopper" name="anonShopper" value="${profile.transient}"/>
+  </actor-chain>
+  
+  <actor-chain id="comments">
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="profile"/>
+    <output id="comments" name="comments" value="${profile.comments}"/>
+  </actor-chain>
+
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/userprofiling/activeCustomerProfileActor.xml#6 $$Change: 833971 $ -->

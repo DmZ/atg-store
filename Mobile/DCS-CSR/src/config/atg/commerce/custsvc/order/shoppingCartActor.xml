@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template>
+  <!-- output the total number of items in the cart -->
+  <actor-chain id="totalCommerceItemCount">
+    <output id="totalItems" name="totalCommerceItemCount" value="${nucleus['/atg/commerce/custsvc/order/ShoppingCart'].current.totalCommerceItemCount}" />
+  </actor-chain>
+
+  <actor-chain id="shoppingCartAndCommerceItemIds">
+    <actor id="totalCommerceItemCount" name="/atg/commerce/custsvc/order/ShoppingCartActor" chain-id="detailed" return-model-var="model">
+      <output id="order" add-map-children="true" value="${model}"/>
+    </actor>
+    <component id="addToCartForm" name="/atg/commerce/custsvc/order/CartModifierFormHandler" method="commerceItemIdsForAddedItems" method-return-var="commerceItemIds">
+      <input name="pId" class-name="[Ljava.lang.String;" value="${param.catalogRefIds}">
+        <tag-converter class-name="atg.droplet.ArrayTagConverter"/>
+      </input>	  
+      <output id="catalogRefCommerceItems" name="catalogRefCommerceItems" value="${commerceItemIds}" />
+    </component>
+  </actor-chain>
+
+  <actor-chain id="detailed">
+    <component id="shoppingCart" name="/atg/commerce/custsvc/order/ShoppingCart" component-var="shoppingCart">
+      <output id="order" name="order" value="${shoppingCart.current}" filter-id="orderDetails"/>
+    </component>
+  </actor-chain>
+  
+  <actor-chain id="getWebCart">
+	  <droplet id="adminOrderLookupDroplet" name="/atg/commerce/order/AdminOrderLookup"  var="orderLookupParamStack" >
+		  <input name="userId"
+			value="${nucleus['/atg/userprofiling/ActiveCustomerProfile'].repositoryId}" />
+		  <input name="state"
+			value="incomplete" />
+		  <input name="sortBy"
+			value="creationDate" />
+		  <input name="sortAscending"
+			value="false" />
+		  <input name="numOrders"
+			value="1" />
+		  <oparam name="output">
+			<component id="pricingTools" name="/atg/commerce/pricing/PricingTools" method="priceOrderTotal">
+		      <input name="order" class-name="atg.commerce.order.Order" index="0" value="${orderLookupParamStack.result[0]}"/>
+			  <input name="pricingModelHolder" class-name="atg.commerce.pricing.PricingModelHolder" index="1" value="${nucleus['/atg/commerce/custsvc/pricing/CustomerPricingModels']}"/>
+		      <input name="locale" class-name="java.util.Locale" index="2" value="${nucleus['/atg/dynamo/servlet/RequestLocale'].locale}"/>
+		      <input name="profile" class-name="atg.repository.RepositoryItem" index="3" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile']}"/>
+		      <input name="parameters" class-name="java.util.Map" index="4" value="priceList=listPrices,salePriceList=salePrices"> 
+			    <tag-converter class-name="atg.droplet.MapTagConverter"/>
+			  </input>
+		    </component>
+			<output id="result" name="result"
+			  value="${orderLookupParamStack.result[0]}" filter-id="detailed" />
+		  </oparam>
+	  </droplet>
+  </actor-chain>
+</actor-template>

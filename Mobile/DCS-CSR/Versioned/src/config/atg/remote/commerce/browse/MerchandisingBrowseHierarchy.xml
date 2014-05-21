@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<browse-hierarchy xml-combine="append">
+
+  <!-- The store text node -->
+  <browse-item id="storeText"
+               label-resource="node.storeText.label"
+               is-root="true"
+               icon-resource="node.storeText.iconSmall">
+
+    <!-- remove the allStoreText list from this level, and add it under a new child browse item -->
+    <list-definition id="allStoreText" xml-combine="remove" />
+
+    <browse-item id="storeTextItems"
+                 label-resource="node.storeText.label"
+                 is-root="true"
+                 icon-resource="node.storeText.iconSmall">
+      <list-definition id="allStoreText"
+                       retriever="query"
+                       child-type="/atg/store/stores/StoreTextRepository:storeText">
+        <retriever-parameter name="query"
+                             value="ALL" />
+      </list-definition>
+    </browse-item>
+
+    <!-- Add a browse item for store announcements -->
+    <browse-item id="storeAnnouncementItems"
+                 label-resource="node.storeAnnouncements.label"
+                 is-root="true"
+                 icon-resource="node.storeAnnouncements.iconSmall">
+
+      <list-definition id="allStoreAnnouncements"
+                       retriever="query"
+                       child-type="/atg/store/stores/StoreTextRepository:storeAnnouncement">
+        <retriever-parameter name="query"
+                             value="ALL" />
+      </list-definition>
+
+    </browse-item>
+  </browse-item> <!-- storeText -->
+
+</browse-hierarchy>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Versioned/config/atg/remote/commerce/browse/MerchandisingBrowseHierarchy.xml#1 $$Change: 846311 $-->

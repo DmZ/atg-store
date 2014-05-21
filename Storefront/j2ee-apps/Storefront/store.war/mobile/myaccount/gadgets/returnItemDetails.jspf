@@ -1,0 +1,149 @@
+<%--
+  A JSP fragment to be included in "returnItemRenderer.jsp". It displays all the details of a return item.
+
+  Includes:
+    /mobile/cart/gadgets/cartItemImg.jsp - Displays the product's image from the repository
+    /global/gadgets/formattedPrice.jsp - Price formatter
+
+  Required parameters:
+    returnItem (JSTL variable)
+      Return item to be rendered.
+    mode (JSTL variable)
+      'confirm' = The page is used in "Return Confirmation" context
+      'detail' = The page is used in "Return Detail" context
+
+  Optional parameters:
+    priceListLocale
+      Specifies a locale in which to format the price (as string).
+      If not specified, locale will be taken from profile price list (Profile.priceList.locale).
+
+  NOTES:
+    1) The "mobileStorePrefix" request-scoped variable (request attribute), which is used here,
+       is defined in the "mobilePageContainer" tag ("mobilePageContainer.tag" file).
+       This variable becomes available within the <crs:mobilePageContainer> ... </crs:mobilePageContainer> block
+       and in all the included pages (gadgets and Endeca cartridges).
+--%>
+<dsp:importbean bean="/atg/commerce/custsvc/returns/ReturnReasonLookupDroplet"/>
+<dsp:importbean bean="/atg/dynamo/droplet/multisite/GetSiteDroplet"/>
+
+<%-- Display product image --%>
+<div class="thumbnail">
+  <dsp:include page="${mobileStorePrefix}/cart/gadgets/cartItemImg.jsp">
+    <dsp:param name="commerceItem" param="commerceItem"/>
+  </dsp:include>
+</div>
+
+<%-- Display product details --%>
+<div class="itemData">
+  <%-- Get product display name. If SKU is deleted, don't take in account SKU name --%>
+  <c:if test="${missingProductSkuId != param.sku.repositoryId}">
+    <dsp:getvalueof var="productDisplayName" param="sku.displayName"/>
+  </c:if>
+  <c:if test="${empty productDisplayName}">
+    <dsp:getvalueof var="productDisplayName" param="product.displayName"/>
+    <c:if test="${empty productDisplayName}">
+      <fmt:message var="productDisplayName" key="common.noDisplayName"/>
+    </c:if>
+  </c:if>
+  <div class="productName">
+    <span><c:out value="${productDisplayName}"/></span>
+  </div>
+
+  <%-- Display SKU number --%>
+  <div class="skuNmbr">
+    <span><fmt:message key="mobile.return.label.sku"/><fmt:message key="mobile.common.colon"/> </span>
+    <span><dsp:valueof param="sku.repositoryId"/></span>
+  </div>
+
+  <%-- Display quantity --%>
+  <div class="dimension">
+    <span>
+      <c:choose>
+        <c:when test="${mode == 'detail'}">
+          <fmt:message key="mobile.return.label.quantityReturned"/><fmt:message key="mobile.common.colon"/>
+        </c:when>
+        <c:when test="${mode == 'confirm'}">
+          <fmt:message key="mobile.return.label.quantityToReturn"/><fmt:message key="mobile.common.colon"/>
+        </c:when>
+      </c:choose>
+    </span>
+    <span><fmt:formatNumber value="${returnItem.quantityToReturn}" type="number"/></span>
+  </div>
+
+  <%--
+    Render SKU-related properties (like color/size/finish). We do not display availability message
+    here as it's not relevant in the returns context.
+  --%>
+  <dsp:getvalueof var="skuType" vartype="java.lang.String" param="sku.type"/>
+  <c:choose>
+    <%--
+      For the "clothing-sku" type display the following properties:
+        1. size
+        2. color
+    --%>
+    <c:when test="${skuType == 'clothing-sku'}">
+      <dsp:getvalueof var="size" vartype="java.lang.String" param="sku.size"/>
+      <dsp:getvalueof var="color" vartype="java.lang.String" param="sku.color"/>
+      <c:if test="${not empty size}">
+        <div class="dimension">
+          <span><fmt:message key="mobile.common.label.size"/><fmt:message key="mobile.common.colon"/> </span>
+          <span><c:out value="${size}"/></span>
+        </div>
+      </c:if>
+      <c:if test="${not empty color}">
+        <div class="dimension">
+          <span><fmt:message key="mobile.common.label.color"/><fmt:message key="mobile.common.colon"/> </span>
+          <span><c:out value="${color}"/></span>
+        </div>
+      </c:if>
+    </c:when>
+    <%--
+      For the "furniture-sku" type display woodFinish.
+    --%>
+    <c:when test="${skuType == 'furniture-sku'}">
+      <dsp:getvalueof var="woodFinish" vartype="java.lang.String" param="sku.woodFinish"/>
+      <c:if test="${not empty woodFinish}">
+        <div class="dimension">
+          <span><fmt:message key="mobile.common.label.woodFinish"/><fmt:message key="mobile.common.colon"/> </span>
+          <span><c:out value="${woodFinish}"/></span>
+        </div>
+      </c:if>
+    </c:when>
+  </c:choose>
+
+  <%-- Display the site information --%>
+  <div class="dimension">
+    <span><fmt:message key="mobile.common.label.site"/><fmt:message key="mobile.common.colon"/> </span>
+    <span>
+      <dsp:droplet name="GetSiteDroplet">
+        <dsp:param name="siteId" param="commerceItem.auxiliaryData.siteId"/>
+        <dsp:oparam name="output">
+          <dsp:valueof param="site.name"/>
+        </dsp:oparam>
+      </dsp:droplet>
+    </span>
+  </div>
+
+  <%-- Display item total refund --%>
+  <div class="dimension">
+    <span><fmt:message key="mobile.return.label.refund"/><fmt:message key="mobile.common.colon"/> </span>
+    <span>
+      <dsp:include page="/global/gadgets/formattedPrice.jsp">
+        <dsp:param name="price" value="${returnItem.refundAmount}"/>
+        <dsp:param name="priceListLocale" param="priceListLocale"/>
+      </dsp:include>
+    </span>
+  </div>
+
+  <%-- Display the Return Reason --%>
+  <dsp:droplet name="ReturnReasonLookupDroplet">
+    <dsp:param name="id" value="${returnItem.returnReason}"/>
+    <dsp:param name="elementName" value="returnReason"/>
+    <dsp:oparam name="output">
+      <div class="dimension">
+        <span><fmt:message key="mobile.return.label.reason"/><fmt:message key="mobile.common.colon"/> </span>
+        <span><dsp:valueof param="returnReason.readableDescription"/></span>
+      </div>
+    </dsp:oparam>
+  </dsp:droplet>
+</div>

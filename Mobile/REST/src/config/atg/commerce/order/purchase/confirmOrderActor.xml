@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template xsi:noNamespaceSchemaLocation="http://www.atg.com/xsds/actorChain_1.0.xsd"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <actor-chain id="confirmOrder">
+    <!-- ORDER_TOTAL reprice is done in DCS layer -->
+    
+    <!-- call applyPaymentGroups which will set amounts on the payment groups -->
+    <component id="paymentGroupManager" name="/atg/commerce/order/PaymentGroupManager" method="recalculatePaymentGroupAmounts">
+      <input name="order" index="0" class-name="atg.commerce.order.Order" value="${nucleus['/atg/commerce/ShoppingCart'].current}"/>
+    </component> 
+      
+    <!-- change shopping cart filter-id to orderDetails -->
+    <component id="cart" name="/atg/commerce/ShoppingCart" component-var="cart">
+      <output id="order" name="order" value="${cart.current}" filter-id="orderDetails"/>
+    </component>
+    
+    <!-- output some additional properties -->
+    <output id="securityStatus" name="securityStatus" value="${nucleus['/atg/userprofiling/Profile'].securityStatus}"/>
+    <output id="email" name="email" value="${nucleus['/atg/userprofiling/Profile'].email}"/>
+    <output id="couponCode" name="couponCode" value="${nucleus['/atg/store/order/purchase/CouponFormHandler'].currentCouponCode}"/>
+  </actor-chain>
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/MobileCommerce/version/10.2.1/server/MobileCommerce/config/atg/commerce/order/purchase/confirmOrderActor.xml#4 $$Change: 805717 $-->

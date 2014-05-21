@@ -1,0 +1,15 @@
+<actor-template>
+  <actor-chain id="getAdjustments" transaction="TX_SUPPORTS">
+    <output id="manualOrderAdjustments" name="manualOrderAdjustments" value="${nucleus['/atg/commerce/custsvc/order/ShoppingCart'].current.manualAdjustments}" />
+      
+</actor-chain> 
+
+  <!-- return the current adjustments whenever an adjustment has been deleted -->
+  <actor-chain id="deleteAdjustment-success">
+    <actor id="getAdjustments" name="/atg/commerce/custsvc/order/ManualAdjustmentsActor"
+              chain-id="getAdjustments" return-model-var="model">
+      <output id="model" add-map-children="true" value="${model}"/>
+     </actor>
+  </actor-chain>
+
+</actor-template>

@@ -1,0 +1,18 @@
+<actor-template>
+  <actor-chain id="addCreditCard">
+    <form id="creditCardFormHandler">
+      <!-- Override the base chain in order to passthrough the nickname to the form handler. -->
+	  <input name="creditCardMetaInfo.params.nickname" value="${param.nickname}"/>
+      <input name="newAddressMetaInfo.nickname" value="${param.addressNickname}"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="addCreditCard-success">
+    <component id="creditCardFormHandler" xml-combine="remove"/>
+     <!-- Upon the successful addition of a new credit card, return the updated list of credit cards -->
+     <actor id="creditCards" name="/atg/userprofiling/ActiveCustomerProfileActor"
+           chain-id="creditCards" return-model-var="result">
+       <output id="allCreditCards" name="result" value="${result}"/>
+     </actor>
+  </actor-chain>
+</actor-template>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mobile.dcs-csr.versioned" default="all" basedir=".">
+
+  <property name="global.dir" value="${basedir}/../../../"/>
+  <import file="${global.dir}/buildtools/common.xml"/> 
+
+ <!--
+    Executes common's all target for the current project in the case
+    when CSC is installed in the platform
+  -->
+  <target name="all" if="csc.installed" depends="-check-csc-installed"
+          description="Cleans, builds, and installs the project." >
+    <antcall target="common.all"/>
+  </target>
+
+</project>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Versioned/build-base.xml#1 $$Change: 843797 $-->

@@ -1,0 +1,10 @@
+{
+    "workflowState": "ACTIVE",
+    "sling:resourceType": "endeca/content-item",
+    "endTime": "",
+    "mdexMerchRuleID": 16,
+    "startTime": "",
+    "priority": 10,
+    "jcr:primaryType": "endeca:contentItem",
+    "userSegments": ["site.mobileHomeSite"]
+}

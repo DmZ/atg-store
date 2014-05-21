@@ -1,0 +1,7 @@
+<actor-template>
+  <actor-chain id="create-success">
+    <component id="profile" name="/atg/userprofiling/ActiveCustomerProfile" component-var="activeCustomer">
+      <output id="profileId" name="profileId" value="${activeCustomer.repositoryId}" />
+    </component>
+  </actor-chain>
+ </actor-template>

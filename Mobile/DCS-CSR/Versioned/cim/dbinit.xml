@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE database-initializer SYSTEM "http://www.atg.com/dtds/dbinit_2_0.dtd">
+<database-initializer>
+
+  <schema id="internalSecuritySchema">
+    <data-import start-up-module="DPS.InternalUsers" mergeable="false">
+      <repository-path>/atg/userprofiling/InternalProfileRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Versioned/data/crs-security.xml</import-file-path>
+    </data-import>
+  </schema>
+
+  <schema id="versionedSchema">
+
+    <sql>
+      <path>
+        <create>
+          sql/db_components/${database}/versioned_storeannouncements_ddl.sql
+        </create>
+        <drop>
+          sql/uninstall/${database}/drop_versioned_storeannouncements_ddl.sql
+        </drop>
+      </path>
+
+    </sql>
+
+    <data-import start-up-module="DPS.InternalUsers">
+      <repository-path>/atg/userprofiling/InternalProfileRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Versioned/data/internal-users-security.xml</import-file-path>
+    </data-import>
+
+    <data-import start-up-module="Store.EStore.Versioned,DCS-UI">
+      <repository-path>/atg/web/viewmapping/ViewMappingRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Versioned/data/viewmapping.xml</import-file-path>
+      <user>publishing</user>
+      <workspace>store_announcements_viewmapping</workspace>
+      <comment>initial_store_announcements_viewmapping_import</comment>
+    </data-import>
+
+    <data-import start-up-module="Store.EStore.Versioned,Store.Mobile.DCS-CSR.Common">
+      <incompatible-addon-id id="international"/>
+      <repository-path>/atg/store/stores/StoreTextRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Common/data/store-announcements.xml</import-file-path>
+      <user>publishing</user>
+      <workspace>store_announcements_import</workspace>
+      <comment>initial_store_announcements_import</comment>
+    </data-import>
+    
+  </schema>
+
+  <server-instance-type id="management">
+
+    <datasource id="management">
+      <schema id="internalSecuritySchema"/>
+      <schema id="versionedSchema"/>
+    </datasource>
+
+  </server-instance-type>
+
+</database-initializer>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Versioned/cim/dbinit.xml#7 $$Change: 852131 $-->

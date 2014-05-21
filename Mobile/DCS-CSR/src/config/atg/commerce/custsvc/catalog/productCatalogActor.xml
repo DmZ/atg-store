@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template>
+
+ <actor-chain id="getSku">
+    <droplet id="skuLookup">
+      <input name="catalog" value="${nucleus['/atg/commerce/custsvc/environment/CurrentCatalogHolder'].currentCatalog}"/>
+        <oparam name="wrongCatalog">
+	  <output id="error" name="error">
+      	    <message id="SKU_INFO_INVALID" bundle="atg.commerce.catalog.custom.UserResources" key="SKU_INFO_INVALID">
+		<message-param id="arg0" value="${param.skuId}"/>
+		<message-param id="arg1" value="${nucleus['/atg/commerce/custsvc/environment/CurrentCatalogHolder'].currentCatalog}"/>
+            </message>
+	  </output>
+        </oparam>
+        <oparam name="empty">
+	  <output id="error" name="error">
+      	    <message id="SKU_INFO_INVALID" bundle="atg.commerce.catalog.custom.UserResources" key="SKU_INFO_INVALID">
+		<message-param id="arg0" value="${param.skuId}"/>
+		<message-param id="arg1" value="${nucleus['/atg/commerce/custsvc/environment/CurrentCatalogHolder'].currentCatalog}"/>
+            </message>
+	  </output>
+        </oparam>	
+    </droplet>   
+ </actor-chain>
+
+ <actor-chain id="getProductForSku" transaction="TX_SUPPORTS">
+   <actor id="getSku" name="atg/commerce/custsvc/catalog/ProductCatalogActor"
+           chain-id="getSku" return-model-var="result">
+   </actor>
+     <droplet id="isNull" name="/atg/dynamo/droplet/IsNull" var="isNullDroplet">
+       <input name="value" value="${result.sku}" />
+       <oparam name="false">
+       <droplet id="forEach" name="/atg/dynamo/droplet/ForEach" var="ForEach">
+          <input name="array" value="${result.sku.parentProducts}" />
+          <oparam name="output">
+            <actor id="productSummary" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+              chain-id="getProduct" return-model-var="productSummary">
+              <input name="productId" value="${ForEach.element.repositoryId}" />
+              <output id="product" name="product"
+                value="${productSummary.product}" />
+            </actor>
+          </oparam>
+        </droplet>
+       </oparam>
+       <oparam name="true">
+         <output id="error" name="error" value="${result.error}"/>
+       </oparam>			
+     </droplet>
+ </actor-chain>
+ 
+
+ <actor-chain id="getCategory">
+    <!-- Return additional information for child products -->
+    <droplet id="categoryLookup">
+      <input name="catalog" value="${nucleus['/atg/commerce/custsvc/environment/CurrentCatalogHolder'].currentCatalog}"/>
+      <oparam name="output" xml-combine="replace">
+        <droplet id="CatalogItemFilterDroplet" name="/atg/store/droplet/CatalogItemFilterDroplet" var="CatalogItemFilterDroplet">
+            <input name="collection" value="${categoryLookupParamStack.element.childProducts}"/>
+            <oparam name="output">
+              <set-var name="p" value="${(param.p != null) ? param.p : '1'}"/>
+              <droplet id="RangeSort" name="/atg/store/sort/RangeSortDroplet" var="RangeSort">                
+                <input name="array" value="${CatalogItemFilterDroplet.filteredCollection}"/>
+                <input name="howMany" value="${howMany}"/>
+                <input name="start" value="${((p - 1) * howMany) + 1}"/>
+                <input name="sortSelection" value="${(param.sort != null) ? param.sort : 'foo'}"/>
+                <oparam name="outputStart">
+                  <output id="pageNum" name="currentPageNumber" value="${p}" />
+                </oparam>                
+                <oparam name="output">
+                  <actor id="outputProductSummary" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+                    chain-id="outputProductSummary" return-model-var="productSummary">
+                    <input name="product" value="${RangeSort.element}" />
+                    <output id="product" name="childProducts[${RangeSort.index}]" value="${productSummary.product}" />
+                  </actor>
+                 </oparam>               
+               </droplet>
+            </oparam>            
+          </droplet>
+      </oparam>
+    </droplet>
+  </actor-chain>
+
+
+  <actor-chain id="outputProduct">
+    <!--  send view item event -->
+    <droplet id="productBrowsed" name="/atg/commerce/catalog/ProductBrowsed">
+      <input name="eventobject" value="${product}"/>
+      <input name="profile" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile']}" />
+    </droplet>
+
+    <!-- output related products -->
+    <actor id="outputRelatedProducts" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+      chain-id="outputRelatedProducts" return-model-var="relatedProducts">
+      <input name="product" value="${product}" />
+      <output id="relatedProducts" name="product.relatedProducts" value="${relatedProducts.relatedProducts}" filter-id="short" />
+    </actor>
+
+    <droplet id="skuProperties" name="/atg/dynamo/droplet/ForEach" var="forEachProperty">
+      <input name="array" value="${nucleus['/atg/commerce/catalog/CatalogTools'].propertyToLabelMap}" />
+      <oparam name="output">
+        <output id="skuProperties" name="product.skuProperties[${forEachProperty.index}]" value="${forEachProperty.key}" />
+      </oparam>
+    </droplet>
+
+    <!-- if requested, output the recently view products -->
+    <droplet id="switch" name="/atg/dynamo/droplet/Switch" var="switch">
+      <input name="value" value="${param.getRecentlyViewedProducts}" />
+      <oparam name="true">
+        <actor id="recentlyViewedProducts" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+          chain-id="getRecentlyViewedProducts" return-model-var="recentlyViewedProducts">
+          <!-- inputs come from request parameters -->
+          <output id="recentlyViewedProducts" name="recentlyViewedProducts" value="${recentlyViewedProducts.recentlyViewedProducts}"/>
+        </actor>
+      </oparam>
+    </droplet>
+  </actor-chain>
+
+  <!-- add site id and name to product output -->
+  <actor-chain id="outputProductSummary">
+
+    <droplet id="currencyCodeDroplet">
+      <input name="locale" value="${nucleus['/atg/commerce/custsvc/environment/CurrentPriceListHolder'].currentPriceList.locale}" />
+    </droplet>
+
+
+    <droplet id="siteIdDroplet" name="/atg/commerce/multisite/SiteIdForCatalogItem" var="SiteIdDroplet">
+      <input name="item" value="${product}" />
+      <input name="shareableTypeId" value="crs.MobileSite" />
+      <oparam name="output">
+        <output id="productSiteId" name="product.siteId" value="${SiteIdDroplet.siteId}" />
+        <droplet id="getSiteDroplet" name="/atg/dynamo/droplet/multisite/GetSiteDroplet"
+          var="GetSiteDroplet">
+          <input name="siteId" value="${SiteIdDroplet.siteId}" />
+          <oparam name="output">
+            <output id="productSiteName" name="product.siteName" value="${GetSiteDroplet.site.name}" />
+          </oparam>
+        </droplet>
+      </oparam>
+    </droplet>
+  </actor-chain>
+
+  <!-- outputs related products with prices -->
+  <!-- parameters: product - a product repository item -->
+  <actor-chain id="outputRelatedProducts">
+    <droplet id="catalogItemFilter" name="/atg/store/droplet/CatalogItemFilterDroplet" var="CatalogItemFilter">
+      <input name="collection" value="${product.relatedProducts}" />
+      <oparam name="output">
+        <droplet id="itemSiteGroupFilter" name="/atg/store/droplet/ItemSiteGroupFilterDroplet"
+          var="itemSiteGroupFilter">
+          <input name="collection" value="${CatalogItemFilter.filteredCollection}" />
+          <oparam name="output">
+            <droplet id="forEach" name="/atg/dynamo/droplet/ForEach" var="ForEach">
+              <input name="array" value="${itemSiteGroupFilter.filteredCollection}" />
+              <oparam name="output">
+                <actor id="productSummary" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+                  chain-id="outputProductSummary" return-model-var="productSummary">
+                  <input name="product" value="${ForEach.element}" />
+                  <output id="relatedProducts" name="relatedProducts[${ForEach.index}]"
+                    value="${productSummary.product}" />
+                </actor>
+              </oparam>
+            </droplet>
+          </oparam>
+        </droplet>
+      </oparam>
+    </droplet>
+  </actor-chain>
+
+  <!-- send a product browsed/view item event and return recently viewed products -->
+  <!-- these need to be done in one request to avoid a RemovedItemException when returning recently viewed 
+    products -->
+  <actor-chain id="sendViewItemEventGetRecentlyViewedProducts">
+    <droplet id="productLookup" name="/atg/commerce/catalog/ProductLookup" var="productLookupParamStack">
+      <input name="id" value="${(productId != null) ? productId : param.productId}" />
+      <input name="filterBySite" value="false" />
+      <oparam name="output">
+        <droplet id="productBrowsed" name="/atg/commerce/catalog/ProductBrowsed">
+          <input name="eventobject" value="${productLookupParamStack.element}" />
+          <input name="profile" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile']}" />
+        </droplet>
+      </oparam>
+    </droplet>
+
+    <actor id="recentlyViewedProducts" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+      chain-id="getRecentlyViewedProducts" return-model-var="recentlyViewedProducts">
+      <!-- inputs will come from the request parameters -->
+      <output id="recentlyViewedProducts" name="recentlyViewedProducts" 
+        value="${recentlyViewedProducts.recentlyViewedProducts}" />
+    </actor>
+  </actor-chain>
+
+  <actor-chain id="getRecentlyViewedProducts">
+    <droplet id="recentlyViewedFilter" name="/atg/store/droplet/RecentlyViewedFilterDroplet"
+      var="recentProducts">
+      <input name="profile" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile']}" />
+      <input name="collection" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile'].recentlyViewedProducts}" />
+      <input name="size" value="${(size != null) ? size : param.size}" />
+      <oparam name="output">
+        <droplet id="forEach" name="/atg/dynamo/droplet/ForEach" var="ForEach">
+          <input name="array" value="${recentProducts.filteredCollection}" />
+          <oparam name="output">
+            <actor id="productSummary" name="/atg/commerce/custsvc/catalog/ProductCatalogActor"
+              chain-id="outputProductSummary" return-model-var="productSummary">
+              <input name="product" value="${ForEach.element.product}" />
+              <input name="siteId" value="${ForEach.element.siteId}"/>
+              <output id="recentlyViewedProducts" name="recentlyViewedProducts[${ForEach.index}]"
+                value="${productSummary.product}" />
+            </actor>
+          </oparam>
+        </droplet>
+      </oparam>
+    </droplet>
+  </actor-chain>
+
+  <!-- Look up the external profile with the supplied ID and return the recently viewed products for that profile -->
+  <actor-chain id="getRecentlyViewedProductsForCustomer">
+    <droplet id="customerLookup" name="/atg/userprofiling/CustomerProfileLookup"
+          var="customerLookup">
+      <input name="id" value="${param.customerId}" />
+      <input name="elementName" value="customer" />
+      <oparam name="output">
+        <output id="recentlyViewedProducts" name="recentlyViewedProducts" value="${customerLookup.customer.recentlyViewedProducts}"/>
+      </oparam>
+    </droplet>
+  </actor-chain>
+
+  <actor-chain id="priceRangeForProduct">
+    <!-- price ranges for sale and list price lists -->
+    <actor id="productPriceRanges" name="/atg/commerce/pricing/PricingActor"
+      return-model-var="productPriceRanges" chain-id="productPriceRanges">
+      <input name="productId" value="${product.repositoryId}" />
+      <output id="productPriceRanges" name="product" add-map-children="true" value="${productPriceRanges}" />
+    </actor>
+  </actor-chain>
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/commerce/custsvc/catalog/productCatalogActor.xml#9 $$Change: 847908 $ -->

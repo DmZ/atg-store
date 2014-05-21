@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE gsa-template SYSTEM "dynamosystemresource:/atg/dtds/gsa/gsa_1.0.dtd">
+<gsa-template>
+
+<import-items>
+    <add-item item-descriptor="storeAnnouncement" id="200001">
+      <set-property name="titleDefault"><![CDATA[NYC Store Opening Soon]]></set-property>
+      <set-property name="contentDefault"><![CDATA[We are opening a flagship store in New York City. This store has been designed by a top design firm, has 80,000 square feet of selling space, and will remain open 24 hours a day. Encourage your customers to check out our crown jewel next time they're in NYC!]]></set-property>
+      <set-property add="true" name="translations"><![CDATA[es=es_200001]]></set-property>
+    </add-item>
+
+    <add-item item-descriptor="storeAnnouncement" id="200002">
+      <set-property name="titleDefault"><![CDATA[Annual Clearance Sale]]></set-property>
+      <set-property name="contentDefault"><![CDATA[Our annual clearance sale is starting next month. Make sure you push hard to sell the featured, full-price items we're showing you on this dashboard before the clearance sales starts.]]></set-property>
+      <set-property name="stores"><![CDATA[ATGHome-Atlanta127,ATGHome-Atlanta128,ATGHome-Boston138,ATGHome-Bozeman145]]></set-property>    
+      <set-property add="true" name="translations"><![CDATA[es=es_200002]]></set-property>
+    </add-item>
+
+    <add-item item-descriptor="storeAnnouncement" id="200003">
+      <set-property name="titleDefault"><![CDATA[All-expense paid trip]]></set-property>
+      <set-property name="contentDefault"><![CDATA[Remember that the associate with the best sales this month is eligible to win an all-expense paid vacation to Cancun. Delight your customers with exceptional service and get those cash registers ringing for a chance to win this amazing prize!]]></set-property>
+      <set-property add="true" name="translations"><![CDATA[es=es_200003]]></set-property>
+    </add-item>
+
+    <add-item item-descriptor="storeAnnouncement" id="200004">
+      <set-property name="titleDefault"><![CDATA[Security Alert]]></set-property>
+      <set-property name="contentDefault"><![CDATA[The security department has been reporting an uptick in clothing theft. Apparently, security tags are being removed/cut and unpaid merchandise is walking out of the store. Please stay vigilant and step up on your monitoring of the fitting rooms.]]></set-property>
+      <set-property name="stores"><![CDATA[ATGStore-MtLaurel154,ATGStore-NewYork159,ATGStore-Orlando123,ATGStore-Princeton155,ATGStore-RedwoodShores106]]></set-property>
+      <set-property add="true" name="translations"><![CDATA[es=es_200004]]></set-property>
+    </add-item>
+
+    <add-item item-descriptor="storeAnnouncement" id="200005">
+      <set-property name="titleDefault"><![CDATA[Fire Marshalls]]></set-property> 
+      <set-property name="contentDefault"><![CDATA[It is our policy to provide a safe and healthful working environment for all employees.  It is a legal requirement that all employees comply with the Health, Safety and Welfare Policy. 
+ 
+Please be aware of the nearest fire exit and the fire marshal for your department. In the event of a fire follow the fire marshal?s instructions.]]></set-property>
+      <set-property add="true" name="translations"><![CDATA[es=es_200005]]></set-property>
+    </add-item>
+
+    <add-item id="es_200005" item-descriptor="storeAnnouncementTranslation">
+      <set-property name="title"><![CDATA[Rpbles de seguridad]]></set-property>
+      <set-property name="content"><![CDATA[Nuestra política se basa en proporcionar un entorno laboral seguro y saludable. Es un requisito legal que todos los empleados cumplan con la normativa de salud, seguridad y bienestar.  Infórmese de donde está la salida de incendios más próxima y de quién es el responsable de seguridad  de su departamento. En caso de incendio, siga las instrucciones del responsable de seguridad.]]></set-property>
+    </add-item>
+    <add-item id="es_200002" item-descriptor="storeAnnouncementTranslation">
+      <set-property name="title"><![CDATA[Rebajas por liquidación anual]]></set-property>
+      <set-property name="content"><![CDATA[El próximo mes comienza nuestra campaña de liquidación anual. Asegúrese de que ha hecho el máximo esfuerzo por vender los artículos destacados y de precio completo que mostramos en este panel de control, antes del inicio de la liquidación.]]></set-property>
+    </add-item>
+    <add-item id="es_200001" item-descriptor="storeAnnouncementTranslation">
+      <set-property name="title"><![CDATA[Próxima apertura de tienda NYC]]></set-property>
+      <set-property name="content"><![CDATA[Vamos a abrir una tienda emblemática en la ciudad de Nueva York. Su diseño ha sido realizado por una importante firma, contará con una superficie de venta de 24.000 metros cuadrados y permanecerá abierta las 24 horas del día. Anime a sus clientes a conocer nuestra "joya de la corona" en su próxima visita a Nueva York.]]></set-property>
+    </add-item>
+    <add-item id="es_200004" item-descriptor="storeAnnouncementTranslation">
+      <set-property name="title"><![CDATA[Alerta de seguridad]]></set-property>
+      <set-property name="content"><![CDATA[El departamento de seguridad ha sido notificado de un repunte de robos de ropa. Aparentemente, las etiquetas de seguridad han sido cortadas/quitadas y la mercancía ha salido de la tienda sin pasar por caja. Por favor, permanezcan alerta y aumenten la vigilancia de los monitores de los cambiadores.]]></set-property>
+    </add-item>
+    <add-item id="es_200003" item-descriptor="storeAnnouncementTranslation">
+      <set-property name="title"><![CDATA[Viaje todos gastos pagados]]></set-property>
+      <set-property name="content"><![CDATA[Recuerde que el agente comercial con la mejor venta de este mes podrá ganar unas vacaciones a Cancún, con todos los gastos pagados. Cautive a sus clientes con un servicio excepcional para que la caja registradora no deje de sonar y lograr este maravilloso premio.]]></set-property>
+    </add-item>
+  </import-items>
+</gsa-template>

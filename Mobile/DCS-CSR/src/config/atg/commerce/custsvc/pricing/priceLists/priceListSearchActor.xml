@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template default-chain-id="priceListSearch"
+  xsi:noNamespaceSchemaLocation="http://www.atg.com/xsds/actorChain_1.0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <!--  This chain is used to locate pricelist items -->
+  <actor-chain id="priceListSearch" transaction="TX_SUPPORTS">
+    <form id="priceListSearchFormHandler" name="/atg/commerce/custsvc/pricing/priceLists/MorePriceListsSearch" var="priceListSearchFormHandler" handle="search">
+      <input name="successURL" value="/model/atg/commerce/custsvc/pricing/priceLists/PriceListSearchActor/priceListSearch-success"/>
+      <input name="errorURL" value="/model/atg/commerce/custsvc/pricing/priceLists/PriceListSearchActor/priceListSearch-error"/>
+      <!-- Clients might want all price lists, and therefore not include search criteria -->
+      <input name="allowEmptySearch" value="true" />
+    </form>
+  </actor-chain>
+
+ <!-- Forwards to the error chain in order to output errors from the form handler -->
+  <actor-chain id="priceListSearch-error" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/commerce/custsvc/pricing/priceLists/PriceListSearchActor" chain-id="error" return-model-var="model">
+      <output id="model" add-map-children="true" value="${model}"/>
+    </actor>
+  </actor-chain>
+  
+  <!-- Outputs the search results -->
+  <actor-chain id="priceListSearch-success" transaction="TX_SUPPORTS">
+    <component id="priceListSearchFormHandler" name="/atg/commerce/custsvc/pricing/priceLists/MorePriceListsSearch" component-var="priceListSearchFormHandler"/>
+    <output id="searchResults" name="searchResults" value="${priceListSearchFormHandler.searchResults}"/>
+  </actor-chain>
+
+  <!--  Outputs any formhandler errors.  Use a different transaction in case the current transaction was rolled back -->
+  <actor-chain id="error" transaction="TX_SUPPORTS">
+    <component id="fh" name="/atg/commerce/custsvc/pricing/priceLists/MorePriceListsSearch" component-var="fh">
+      <output id="formError" name="formError" value="${fh.formError}"/>
+      <output id="formExceptions" name="formExceptions" value="${fh.formExceptions}"/>
+    </component>
+  </actor-chain>
+
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/commerce/custsvc/pricing/priceLists/priceListSearchActor.xml#2 $$Change: 842356 $ -->

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE database-initializer SYSTEM "http://www.atg.com/dtds/dbinit_1_0.dtd">
+<database-initializer>
+
+  <schema id="versionedSchema">
+
+    <sql>
+      <path>
+        <create>
+          sql/db_components/${database}/versioned_storeannouncements_i18n_ddl.sql
+        </create>
+        <drop>
+          sql/uninstall/${database}/drop_versioned_storeannouncements_i18n_ddl.sql
+        </drop>
+      </path>
+
+    </sql>
+
+    <data-import start-up-module="Store.EStore.Versioned,DCS-UI,Store.Mobile.DCS-CSR.Versioned">
+      <repository-path>/atg/web/viewmapping/ViewMappingRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Common/International/Versioned/data/viewmapping.xml</import-file-path>
+      <user>publishing</user>
+      <workspace>store_announcements_i18n_viewmapping</workspace>
+      <comment>initial_store_announcements_i18n_viewmapping_import</comment>
+    </data-import>
+
+    <data-import start-up-module="Store.EStore.Versioned,Store.Mobile.DCS-CSR.Common.International">
+      <requires-addon-id id="international"/>
+      <repository-path>/atg/store/stores/StoreTextRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Common/International/data/store-announcements.xml</import-file-path>
+      <user>publishing</user>
+      <workspace>store_announcements_i18n_import</workspace>
+      <comment>initial_store_announcements_i18n_import</comment>
+    </data-import>
+
+  </schema>
+
+  <server-instance-type id="management">
+
+    <datasource id="management">
+      <schema id="versionedSchema"/>
+    </datasource>
+
+  </server-instance-type>
+
+</database-initializer>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Common/International/Versioned/cim/dbinit.xml#2 $$Change: 851912 $-->

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE gsa-template SYSTEM "dynamosystemresource:/atg/dtds/gsa/gsa_1.0.dtd">
+<gsa-template>
+<import-items>
+
+<!-- Adjust the content propertyViewMapping so it uses a plain text editor instead of the default HTML editor -->
+
+<add-item item-descriptor="itemViewMapping" id="aMgrIvmEditStoreAnnouncementText"> 
+  <set-property name="propertyMappings" add="true" value="contentDefault=aMgrPvmEditCRSPlainTextTemplate,content=aMgrPvmEditCRSPlainTextTemplate"></set-property>
+</add-item>
+
+<add-item item-descriptor="itemMapping" id="aMgrImEditStoreAnnouncementTranslation">
+  <set-property name="name"><![CDATA[AssetManager]]></set-property>
+  <set-property name="description"><![CDATA[Store Announcements Translation itemMapping]]></set-property>
+  <set-property name="mode"><![CDATA[AmMmDef]]></set-property>
+  <set-property name="itemPath"><![CDATA[/atg/store/stores/StoreTextRepository]]></set-property>
+  <set-property name="itemName"><![CDATA[storeAnnouncementTranslation]]></set-property>
+  <set-property name="formHandler"><![CDATA[crsAmFh]]></set-property>
+  <set-property name="viewMappings"><![CDATA[aMgrIvmEditStoreAnnouncementText]]></set-property>
+  <set-property name="attributes"><![CDATA[resourceBundle=aMgrAvCrsResourceBundle]]></set-property>
+</add-item>
+
+</import-items>
+
+</gsa-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Common/International/Versioned/data/viewmapping.xml#1 $$Change: 847017 $-->

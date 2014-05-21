@@ -1,0 +1,74 @@
+<%--
+  Header fragment of the page.
+  This fragment is used to begin the page. It works in pair with "footer.jspf".
+  It's included by the "mobilePageContainer" custom tag.
+
+  Includes:
+    /mobile/navigation/gadgets/search.jsp - Search block
+    /mobile/cart/gadgets/cartItemCount.jspf - Stores the cart item count in the "itemsQuantity" page-scoped variable
+
+  NOTES:
+    1) The "siteContextPath", "navigationActionPath", "mobileImagesPrefix", "storeName" request-scoped variables (request attributes),
+       which are used here, are defined in the "mobilePageContainer" tag ("mobilePageContainer.tag" file).
+       These variables become available within the <crs:mobilePageContainer> ... </crs:mobilePageContainer> block
+       and in all the included pages (gadgets and Endeca cartridges).
+--%>
+<dsp:importbean bean="/atg/endeca/assembler/droplet/InvokeAssembler"/>
+
+<dsp:getvalueof var="siteIcon" bean="/atg/multisite/Site.siteIcon"/>
+
+<header id="mainHeader">
+  <%-- Home page "Logo" --%>
+  <div class="headerLogo" role="button" aria-label="${storeName}" onclick="document.location = '${siteContextPath}/';">
+    <img src="${siteIcon}" alt="${storeName}"/>
+  </div>
+
+  <%-- "Search" block --%>
+  <dsp:droplet name="InvokeAssembler">
+    <dsp:param name="contentCollection" value="/content/Shared/Global Search Configuration/Search Box"/>
+    <dsp:oparam name="output">
+      <dsp:getvalueof var="searchBox" vartype="com.endeca.infront.assembler.ContentItem" param="contentItem"/>
+    </dsp:oparam>
+  </dsp:droplet>
+  <c:if test="${not empty searchBox}">
+    <dsp:renderContentItem contentItem="${searchBox}"/>
+  </c:if>
+
+  <%-- "Browse" shortcut --%>
+  <div class="headerBrowse">
+    <a href="${siteContextPath}${navigationActionPath}?Dy=1&Nty=1&nav=true" role="button" aria-label="<fmt:message key='mobile.pageHeader.button.browse'/>">
+      <img src="${mobileImagesPrefix}icon-browse.png" alt="<fmt:message key='mobile.pageHeader.button.browse'/>"/>
+    </a>
+  </div>
+
+  <div class="dividerBar"></div>
+
+  <%-- "Shopping Cart" shortcut --%>
+  <div class="headerCart">
+    <%-- How many items are in the "Shopping Cart" ? --%>
+    <%@include file="/mobile/cart/gadgets/cartItemCount.jspf"%>
+    <fmt:message var="cartTitle" key="mobile.cart.title"/>
+    <c:if test="${itemsQuantity > 0}">
+      <fmt:message key="mobile.common.quantity" var="quantity"/>
+      <c:set var="cartTitle" value="${cartTitle} ${quantity}"/>
+    </c:if>
+    <a href="${siteContextPath}/cart/cart.jsp" role="button">
+      <img src="${mobileImagesPrefix}icon-cart.png"/>
+      <%-- VoiceOver reads the quantity badge since it is on top of the cart icon. Therefore, we need to create
+          a hidden text to elaborate more on the number. --%>
+      <span class="invisible">${cartTitle}</span>
+      <span id="cartBadge" ${itemsQuantity == 0 ? 'style="display:none"' : ''}>
+        <dsp:valueof value="${itemsQuantity}"/>
+      </span>
+    </a>
+  </div>
+</header>
+
+<div id="messagePopup">
+  <div class="messageContainer" onclick="CRSMA.mobilepage.hidePopup()">
+    <div class="message">
+      <span id="messageText"></span>
+    </div>
+  </div>
+</div>
+<%-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Storefront/j2ee/store.war/mobile/includes/header.jspf#14 $$Change: 803125 $--%>

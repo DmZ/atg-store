@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE database-initializer SYSTEM "http://www.atg.com/dtds/dbinit_1_0.dtd">
+<database-initializer>
+
+  <schema id="announcementsSchema">
+
+    <sql>
+      <path>
+        <create>
+          sql/db_components/${database}/storeannouncements_ddl.sql
+        </create>
+        <drop>
+          sql/uninstall/${database}/drop_storeannouncements_ddl.sql
+        </drop>
+      </path>
+
+    </sql>
+
+    <data-import start-up-module="Store.EStore,Store.Mobile.DCS-CSR.Common">
+      <incompatible-addon-id id="international"/>
+      <repository-path>/atg/store/stores/StoreTextRepository</repository-path>
+      <import-file-path>/CommerceReferenceStore/Store/Mobile/DCS-CSR/Common/data/store-announcements.xml</import-file-path>
+    </data-import>
+    
+  </schema>
+
+  <server-instance-type id="production_db">
+
+    <datasource id="nonswitchingCore">
+      <schema id="announcementsSchema"/>
+    </datasource>
+
+    <datasource id="switchingA">
+      <schema id="announcementsSchema"/>
+    </datasource>
+
+    <datasource id="switchingB">
+      <schema id="announcementsSchema"/>
+    </datasource>
+
+  </server-instance-type>
+
+
+</database-initializer>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Common/cim/dbinit.xml#3 $$Change: 851912 $-->

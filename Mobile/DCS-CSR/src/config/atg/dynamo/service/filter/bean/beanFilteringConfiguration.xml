@@ -1,0 +1,193 @@
+<bean-filtering>
+  <repository name="/atg/userprofiling/InternalProfileRepository">
+    <item-descriptor  name="user">
+      <filter id="summary">
+        <!-- For consistency on the client, return the ID as a property named 'repositoryId' -->
+        <property name="id" xml-combine="remove"/>
+        <property name="repositoryId" target="id"/>
+        <property name="locale"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+
+  <repository name="/atg/commerce/locations/LocationRepository">
+    <item-descriptor name="store" default-filter="summary">
+      <filter id="summary">
+        <!-- Include the item ID in the summary -->
+        <property name="repositoryId" target="locationId"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+  
+  <repository name="/atg/userprofiling/ProfileAdapterRepository">
+    <item-descriptor name="user">
+      <filter id="summary">
+		<property name="id" xml-combine="remove"/>
+		<property name="phoneNumber" xml-combine="remove"/>
+        <property name="repositoryId" target="id"/>
+		<property name="phoneNumber" target="billingAddress.phoneNumber"/>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="contactInfo">
+      <filter id="detailed">
+        <property name="item-id" xml-combine="remove"/>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="credit-card">
+      <filter id="summary">
+        <property name="repositoryId" target="id"/>
+      </filter>
+      <filter id="address">
+        <property name="addressId" target="billingAddress.id"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+
+  <repository name="/atg/commerce/catalog/ProductCatalog">
+    <item-descriptor name="catalog" default-filter="summary">
+      <filter id="summary">
+        <!-- For consistency on the client, return the ID as a property named 'repositoryId' -->
+        <property name="id" xml-combine="remove"/>
+        <property name="repositoryId" target="id"/>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="product">
+      <filter id="summary">
+        <!-- Output the range of prices of this product's SKUs -->
+        <property name="priceRange" property-customizer="/atg/dynamo/service/filter/bean/ActorInvokerPropertyCustomizer">
+          <attribute name="actor-path" value="/atg/commerce/custsvc/catalog/ProductCatalogActor" />
+          <attribute name="chain-id" value="priceRangeForProduct" />
+          <attribute name="objectParameterName" value="product" />
+        </property>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="sku">
+      <filter id="summary">
+        <property name="parentProducts" target="parentProducts"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+
+  <repository name="/atg/commerce/pricing/priceLists/PriceLists">
+    <item-descriptor name="priceList" default-filter="summary">
+      <filter id="summary">
+        <property name="repositoryId" target="id"/>
+        <property name="displayName"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+
+  <bean name="atg.multisite.Site">
+    <filter id="getSites">
+      <property name="siteID" target="id"/>
+      <property name="name"/>
+      <property name="productionURL"/>
+      <property name="siteIcon" target="favicon"/>
+    </filter>
+  </bean>
+
+  <bean name="atg.commerce.inventory.InventoryInfo" default-filter="summary">
+    <filter id="summary">
+      <property name="availabilityStatusMsg"/>
+      <property name="stockLevel"/>
+    </filter>
+  </bean>
+  
+  <bean name="atg.commerce.order.InStorePickupShippingGroup" default-filter="summary">
+    <filter id="summary">
+      <property name="locationId" />
+    </filter>
+    <filter id="detailed">
+      <property name="locationId" />
+    </filter>
+    <filter id="orderDetails">
+      <property name="locationId" />
+    </filter>
+  </bean>
+  
+  <!-- include auxiliary data in the commerce item -->
+  <bean name="atg.commerce.order.CommerceItem">
+    <filter id="detailed">
+      <property name="auxiliaryData"/> 
+    </filter>
+    <filter id="orderDetails" include-filter="summary">
+      <property name="returnable" xml-combine="remove"/>
+    </filter>
+  </bean>
+  <bean name="atg.core.util.ContactInfo">
+    <filter id="detailed">
+      <property name="id" xml-combine="remove"/>
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.RepositoryContactInfo">
+    <filter id="summary">
+      <property name="repositoryId" target="repositoryItem.repositoryId"/>
+    </filter>
+  </bean>
+  <repository name="/atg/commerce/order/OrderRepository">
+    <item-descriptor name="manualPricingAdjustment">
+      <filter id="summary">
+        <property name="repositoryId" target="id"/>
+      </filter>
+      <filter id="detailed">
+        <property name="repositoryId" target="id"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+
+  <bean default-filter="summary" name="atg.commerce.pricing.OrderPriceInfo">
+    <filter id="summary">
+      <!-- We only want the actual promotions, so filter out adjustments with null pricing models -->
+      <property property-customizer="/atg/dynamo/service/filter/bean/RemoveNullsFromListPropertyCustomizer" name="adjustments">
+        <attribute name="propertyName" value="pricingModel"/>
+      </property>
+      <property name="manualAdjustmentTotal"/>
+    </filter>
+  </bean>
+
+  <bean default-filter="summary" name="atg.commerce.pricing.ItemPriceInfo">
+    <filter id="summary">
+      <!-- We only want the actual promotions, so filter out adjustments with null pricing models -->
+      <property property-customizer="/atg/dynamo/service/filter/bean/RemoveNullsFromListPropertyCustomizer" name="adjustments">
+        <attribute name="propertyName" value="pricingModel"/>
+      </property>
+      <property name="discounted"/>
+      <property name="salePrice"/>
+      <property name="onSale"/>
+    </filter>
+  </bean>
+
+  <bean default-filter="summary" name="atg.commerce.pricing.PricingAdjustment">
+    <filter id="summary">
+      <property name="totalAdjustment"/>
+    </filter>
+  </bean>
+
+  <bean default-filter="summary" name="atg.commerce.pricing.ShippingPriceInfo">
+    <filter id="summary">
+      <!-- Return rawShipping as a property named "rawSubtotal".  This allows out client model objects to
+           be more generic. --> 
+      <property name="rawShipping" xml-combine="remove"/>
+      <property name="rawSubtotal" target="rawShipping"/>
+    </filter>
+  </bean>
+
+  <bean name="atg.projects.store.order.StoreOrderImpl">
+    <filter id="orderHistory">
+      <property name="thumbnailImageUrl" xml-combine="remove"/>
+      <property name="transient"/>
+      <property name="state"/>
+    </filter>
+  </bean>
+
+  <bean default-filter="summary" name="atg.projects.store.payment.StoreStoreCredit">
+    <filter id="summary">
+      <property name="amountAppliedToOrder"/>
+    </filter>
+    <filter id="detailed">
+      <property name="amountAppliedToOrder"/>
+    </filter>
+  </bean>
+
+</bean-filtering>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/dynamo/service/filter/bean/beanFilteringConfiguration.xml#26 $$Change: 856578 $-->

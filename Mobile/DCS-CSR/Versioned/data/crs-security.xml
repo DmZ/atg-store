@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE gsa-template SYSTEM "dynamosystemresource:/atg/dtds/gsa/gsa_1.0.dtd">
+
+<gsa-template>
+<import-items>
+<add-item item-descriptor="accessRight" id="storeannouncementread">
+  <set-property name="name"><![CDATA[storeannouncementread]]></set-property>
+  <set-property name="displayName"><![CDATA[Store Announcement Read-Only Access]]></set-property>
+  <set-property name="description"><![CDATA[Gives read-only access to all Store Announcement type items]]></set-property>
+  <set-property name="scope"><![CDATA[global]]></set-property>
+</add-item>
+<add-item item-descriptor="accessRight" id="storeannouncementfull">
+  <set-property name="name"><![CDATA[storeannouncementfull]]></set-property>
+  <set-property name="displayName"><![CDATA[Store Announcement Full Access]]></set-property>
+  <set-property name="description"><![CDATA[Gives full access to all Store Announcement type items]]></set-property>
+  <set-property name="scope"><![CDATA[global]]></set-property>
+</add-item>
+</import-items>
+</gsa-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Versioned/data/crs-security.xml#1 $$Change: 850771 $ -->

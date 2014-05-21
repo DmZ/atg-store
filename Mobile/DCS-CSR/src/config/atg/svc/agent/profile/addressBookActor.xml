@@ -1,0 +1,12 @@
+<actor-template>
+  <actor-chain id="addAddress">
+    <form id="addressBookFormHandler">
+	  <input name="addressMetaInfo.nickname" value="${param.nickname}"/>
+	</form>
+  </actor-chain>
+  <actor-chain id="updateAddress">
+    <form id="addressBookFormHandler">
+	  <input name="addressMetaInfo.nickname" value="${param.nickname}"/>
+	</form>
+  </actor-chain>
+ </actor-template>

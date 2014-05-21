@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template default-chain-id="lookup"
+  xsi:noNamespaceSchemaLocation="http://www.atg.com/xsds/actorChain_1.0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <actor-chain id="lookupNearStore">
+    <droplet id="allStores" name="/atg/store/droplet/StoreLookupDroplet" var="storeLookupDroplet">
+      <input name="queryRQL" value='locationId = "${param.locationId}"'/>
+      <oparam name="output">
+        <actor id="lookup" name="/atg/commerce/locations/GeoLocatorActor" chain-id="lookup" return-model-var="lookupActor">
+          <input name="coordinateItem" value="${storeLookupDroplet.items[0]}" />
+          <input name="distance" value="${param.distance}" />
+          <input name="siteIds" value="${param.siteIds}" />
+          <output id="result" name="result" value="${lookupActor.result}" />
+        </actor>
+      </oparam>
+    </droplet>
+  
+  </actor-chain>
+  <actor-chain id="lookup">
+    <droplet id="storeLocator" name="/atg/commerce/locations/StoreLocatorDroplet" var="storeLocator">
+       <input name="coordinateItem" value="${param.coordinateItem ? param.coordinateItem : coordinateItem}" />
+       <input name="latitude" value="${param.latitude ? param.latitude : latitude}" />
+       <input name="longitude" value="${param.longitude ? param.longitude : longitude}" />
+       <input name="distance" value="${param.distance ? param.distance : distance}" />
+       <input name="itemType" value="store" />
+       <input name="siteIds" value="${param.siteIds ? param.siteIds : siteIds}" />
+       <oparam name="output">
+         <output id="result" name="result" value="${storeLocator.result}" />
+         <!-- retrieve the inventory for each store if a skuId was specified -->
+         <droplet id="isNull" name="/atg/dynamo/droplet/IsNull" var="isNullDroplet">
+           <input name="value" value="${param.skuId}" />
+           <oparam name="false">
+             <droplet id="forEachStore" name="/atg/dynamo/droplet/ForEach" var="forEachStore">
+               <input name="array" value="${storeLocator.result}" />
+               <oparam name="output">
+                <droplet id="inventory" name="/atg/commerce/inventory/InventoryLookup" var="inventoryLookup">
+                  <input name="itemId" value="${param.skuId}" />
+                  <input name="locationId" value="${forEachStore.element.repositoryId}" />
+                  <oparam name="output">
+                    <output id="error" name="result[${forEachStore.index}].error" value="${inventoryLookup.error}" />
+                    <output id="inventoryInfo" name="result[${forEachStore.index}].inventoryInfo" value="${inventoryLookup.inventoryInfo}" />
+                  </oparam>
+                </droplet>
+               </oparam>
+             </droplet>
+           </oparam>
+         </droplet>
+       </oparam>
+    </droplet>
+  </actor-chain>
+  
+</actor-template>
+                
+<!-- @version $Id: //hosting-blueprint/MobileCommerce/dev/10.2/server/MobileCommerce/config/atg/store/mobile/rest/actors/profile.xml#1 
+  $$Change: 842356 $ -->

@@ -1,0 +1,42 @@
+<%--
+  Body part generation of the "mobilePageContainer" custom tag.
+
+  Includes:
+    /mobile/includes/header.jspf - Header fragment of enclosed page
+    /mobile/includes/footer.jspf - Footer fragment of enclosed page
+
+  NOTES:
+    1) The "mobileStorePrefix" request-scoped variable (request attribute), which is used here,
+       is defined in the "mobilePageContainer" tag ("mobilePageContainer.tag" file).
+       This variable becomes available within the <crs:mobilePageContainer> ... </crs:mobilePageContainer> block
+       and in all the included pages (gadgets and Endeca cartridges).
+--%>
+<div id="pageContainer">
+  <%@ include file="/mobile/includes/header.jspf" %>
+
+  <div class="storeContainer">
+    <jsp:doBody/>
+  </div>
+
+  <%@ include file="/mobile/includes/footer.jspf" %>
+
+  <div id="modalOverlay" ${(not empty displayModal && displayModal) ? '' : 'class="hidden"'} onclick="CRSMA.common.toggleModal(false);">
+    <div class="shadow">
+      <%--
+        Accessibility hint to allow user to dismiss the modal overlay.
+        br elements move the text down the page; anything other than plain text will not be read
+      --%>
+      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+      <fmt:message key="mobile.page.a11y.overlay"/>
+    </div>
+    <div id="contactInfo">
+      <ul class="dataList">
+        <li><div class="content"><fmt:message key="navigation_tertiaryNavigation.contactUs"/></div></li>
+        <li><div class="content"><dsp:include page="${mobileStorePrefix}/includes/gadgets/phone.jsp"/></div></li>
+        <li><div class="content"><dsp:include page="${mobileStorePrefix}/includes/gadgets/email.jsp"/></div></li>
+      </ul>
+    </div>
+    <jsp:invoke fragment="modalContent"/>
+  </div>
+</div>
+<%-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Storefront/j2ee/store.war/mobile/includes/mobilePageContainerTagBody.jspf#5 $$Change: 800951 $--%>

@@ -1,0 +1,39 @@
+<actor-template>
+  <actor-chain id="changeOrder">
+    <form id="changeOrder">
+      <!-- Ensure the redirect URLs specified in the base definition are not overwritten -->
+      <input name="ensureRestURLs" value="true"/>
+    </form>
+
+ <!-- When we change order, we don't want the current site to change, so select the site according to what's set in the parameter map-->
+   <actor id="selectSite" name="/atg/svc/agent/environment/ChangeSiteActor"
+           chain-id="selectSite" return-model-var="result">
+     <input name="siteId" value="${param.siteId}" />
+   </actor>
+  </actor-chain>
+
+  <actor-chain id="newOrder" transaction="TX_SUPPORTS">
+    <form id="changeOrder" name="/atg/commerce/custsvc/environment/ChangeOrder" var="changeOrder" handle="changeEnvironment">
+      <input name="environmentChangeKey" value="createNewOrder"/>
+      <input name="doWarnings" value="${param.doWarnings}"/>
+      <input name="doTicketDispositionPrompt" value="${param.doTicketDispositionPrompt}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.dispositionOption" value="${param.dispositionOption}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.reasonCode" value="${param.reasonCode}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.ticketNote" value="${param.ticketNote}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.publicNote" value="${param.publicNote}"/>
+
+      <input name="errorURL" value="${errorURL != null ? errorURL : '/model/atg/commerce/custsvc/environment/ChangeOrderActor/newOrder-error'}"/>
+      <input name="successURL" value="${successURL != null ? successURL : '/model/atg/commerce/custsvc/environment/ChangeOrderActor/newOrder-success'}"/>
+      <input name="confirmURL" value="${confirmURL != null ? confirmURL : '/model/atg/commerce/custsvc/environment/ChangeOrderActor/changeOrder-confirm'}"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="newOrder-error" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/commerce/custsvc/environment/ChangeOrderActor" chain-id="error" return-model-var="model">
+      <output id="model" add-map-children="true" value="${model}"/>
+    </actor>
+  </actor-chain>
+  <actor-chain id="newOrder-success" transaction="TX_SUPPORTS">
+  </actor-chain>
+
+</actor-template>

@@ -1,0 +1,8 @@
+<!-- this file sets the cache mode to distributed for all promotion item descriptors so when preview
+     is being used with a standalone preview server, all server instances in the cluster invalidate items
+     in their cache when a change is made on the BCC server. -->
+
+<gsa-template xml-combine="append">
+  <item-descriptor name="closenessQualifierTranslation" cache-mode="distributed"></item-descriptor>
+</gsa-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/EStore/International/Versioned/liveconfig/atg/commerce/pricing/pricingModels.xml#1 $$Change: 801304 $ -->

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<bean-filtering>
+  <repository name="/atg/userprofiling/ProfileAdapterRepository">
+    <item-descriptor name="user">
+      <filter id="summary">
+        <property name="gender"/>
+        <property name="dateOfBirth"/>
+        <property name="receivePromoEmail"/>
+        <property name="phoneNumber" target="homeAddress.phoneNumber"/>
+        <property name="email"/>
+        <property name="postalCode" target="homeAddress.postalCode"/>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="credit-card">
+      <filter id="short">
+        <property name="creditCardType"/>
+        <property name="creditCardNumber" property-customizer="/atg/commerce/payment/filter/bean/CreditCardNumberPropertyCustomizer"/>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="contactInfo">
+      <filter id="summary">
+        <property name="address2"/>
+        <property name="phoneNumber"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+  <repository name="/atg/commerce/catalog/ProductCatalog">
+    <item-descriptor name="product">
+      <filter id="summary">
+        <property name="repositoryId" target="id"/>
+      </filter>
+      <filter id="short">
+        <property name="repositoryId"/>
+        <property name="displayName"/>
+        <property name="thumbnailImageUrl" target="thumbnailImage.url"/>
+        <property name="mediumImageUrl" target="mediumImage.url"/>
+        <property name="itemDescriptorName" target="itemDescriptor.itemDescriptorName"/>
+      </filter>
+    </item-descriptor>
+    <item-descriptor name="promotionalContent" default-filter="summary">
+      <filter id="summary">
+        <property name="derivedDeviceImage"/>
+        <property name="deviceDescription"/>
+        <property name="id"/>
+        <property name="repositoryId" target="id"/>
+        <property name="image" hidden="true"/>
+        <property name="description" hidden="true"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+  <repository name="/atg/commerce/gifts/Giftlists">
+    <item-descriptor name="gift-list">
+      <filter id="summary">
+        <property name="firstName" target="owner.firstName"/>
+        <property name="lastName" target="owner.lastName"/>
+      </filter>
+    </item-descriptor>
+  </repository>
+  <bean name="atg.projects.store.order.StoreOrderImpl" default-filter="orderHistory">
+    <filter id="orderHistory">
+      <property name="thumbnailImageUrl" target="commerceItems[0].auxiliaryData.productRef.thumbnailImage.url" />
+      <property name="containsGiftWrap"/>
+      <property name="shippingGroupCount"/>
+      <property name="orderId" target="id"/>
+      <property name="totalItems" target="originalTotalItemsCount"/>
+      <property name="submittedDate"/>
+      <property name="originOfOrder"/>
+      <property name="lastModifiedTime"/>
+      <property name="status" target="stateDetailAsUserResource"/>
+      <property name="storeCreditsAppliedTotal" />
+      <property name="siteName" target="siteId" property-customizer="/atg/dynamo/service/filter/bean/ActorInvokerPropertyCustomizer">
+        <attribute name="actor-path" value="/atg/dynamo/droplet/multisite/GetSiteActor" />
+        <attribute name="chain-id" value="getSiteName" />
+        <attribute name="propertyParameterName" value="siteId" />
+      </property>
+    </filter>
+    <filter id="summary">
+      <property name="priceInfo"/>
+      <!-- we use the pg relationships instead of the payment groups directly because they are more up to date -->
+      <property name="paymentGroupRelationships"/>
+      <property name="shippingGroups"/>
+    </filter>
+    <filter id="orderDetails" include-filter="orderHistory">
+      <property name="priceInfo"/>
+      <!-- we use the pg relationships instead of the payment groups directly because they are more up to date -->
+      <property name="paymentGroupRelationships"/>
+      <property name="shippingGroups"/>
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.PaymentGroupRelationship">
+    <filter id="orderDetails">
+      <property name="amount"/>
+      <property name="paymentGroup"/>
+      <property name="paymentGroupClass" target="paymentGroup.class"/>
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.ShippingGroup">
+    <filter id="detailed" include-filter="orderDetails"/>
+    <filter id="orderDetails">
+      <property name="id" />
+      <property name="shippingGroupClassType" />
+      <property name="shippingMethod"/>
+      <property name="commerceItemRelationships" property-customizer="/atg/dynamo/service/filter/bean/SGCIRelationshipPropertyCustomizer"/>
+      <property name="priceInfo"/>
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.HardgoodShippingGroup" default-filter="detailed">
+    <filter id="orderDetails">
+      <property name="shippingAddress"/>
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.ShippingGroupCommerceItemRelationship">
+    <filter id="orderDetails">
+      <property name="commerceItem" />
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.CommerceItem">
+    <filter id="summary">
+      <property name="auxiliaryData"/>
+    </filter>
+    <filter id="orderDetails" include-filter="summary">
+      <property name="returnable" property-customizer="/atg/dynamo/service/filter/bean/ActorInvokerPropertyCustomizer">
+        <attribute name="actor-path" value="/atg/commerce/custsvc/returns/ReturnsActor" />
+        <attribute name="chain-id" value="isReturnable" />
+        <attribute name="objectParameterName" value="commerceItem" />
+      </property>
+    </filter>
+  </bean>
+  <bean name="atg.commerce.order.AuxiliaryData">
+    <filter id="orderDetails">
+      <property name="productRef" />
+      <property name="catalogRef" />
+      <property name="siteName" target="siteId" property-customizer="/atg/dynamo/service/filter/bean/ActorInvokerPropertyCustomizer">
+        <attribute name="actor-path" value="/atg/dynamo/droplet/multisite/GetSiteActor" />
+        <attribute name="chain-id" value="getSiteName" />
+        <attribute name="propertyParameterName" value="siteId" />
+      </property>
+    </filter> 
+  </bean>
+  <bean name="atg.projects.store.pricing.StoreItemPriceInfo">
+    <filter id="summary">
+      <property name="listPrice"/>
+    </filter>
+  </bean>
+
+  <bean name="atg.commerce.pricing.AmountInfo" default-filter="summary">
+    <filter id="summary">
+      <property name="amount" />
+      <property name="adjustments" property-customizer="/atg/dynamo/service/filter/bean/RemoveNullsFromListPropertyCustomizer">
+        <attribute name="propertyName" value="pricingModel"/>
+      </property>
+    </filter>    
+  </bean>
+  
+
+  <!-- Returns -->
+  <repository name="/atg/commerce/custsvc/CsrRepository">
+    <item-descriptor name="returnRequest" default-filter="short">
+      <filter id="short">
+        <property name="requestId" target="repositoryId" />
+        <property name="replacementOrderId" />
+        <property name="createdDateTime" target="createdDate.time" />
+      </filter>
+    </item-descriptor>
+  </repository>
+  
+  <bean name="atg.commerce.csr.returns.ReturnRequest" default-filter="summary">
+    <filter id="summary">
+      <property name="requestId" />
+      <property name="thumbnailImageUrl" target="order.commerceItems[0].auxiliaryData.productRef.thumbnailImage.url" />
+      <property name="siteId" target="order.siteId" />
+      <property name="authorizationDateTime" target="authorizationDate.time" />
+      <property name="returnItemCount" />
+      <property name="stateDetailAsUserResource" />
+    </filter>
+    <filter id="detailed" include-filter="summary">
+      <property name="replacementOrderId" target="replacementOrder.id" />
+      <property name="orderPriceInfo" target="order.priceInfo" filter-id="summary" />
+      <property name="orderId" target="order.id" />
+      <property name="orderStoreCreditsAppliedTotal" target="order.storeCreditsAppliedTotal" />
+      <property name="shippingGroupList" filter-id="summary" />
+      <property name="totalRefundAmount" />
+      <property name="totalReturnItemRefund" />
+      <property name="nonReturnItemSubtotalAdjustment" />
+      <property name="actualShippingRefund" />
+      <property name="actualTaxRefund" />
+      <property name="refundMethodList" />
+      <property name="returnItemList" />
+    </filter>
+  </bean>
+  <bean name="atg.commerce.csr.returns.RefundMethod" default-filter="summary">
+    <filter id="summary">
+      <property name="amount" />
+      <property name="refundType" />
+    </filter>
+  </bean>
+  <bean name="atg.commerce.csr.returns.CreditCardRefundMethod" default-filter="summary">
+    <filter id="summary">
+      <property name="creditCard" />
+    </filter>
+  </bean>
+  <bean name="atg.commerce.csr.returns.ReturnShippingGroup" default-filter="summary">
+    <filter id="summary">
+      <property name="itemList" />
+      <property name="shippingAddress" target="shippingGroup.shippingAddress" />
+      <property name="shippingMethod" target="shippingGroup.shippingMethod" />
+      <property name="shippingGroupId" target="shippingGroup.id" />
+    </filter>
+  </bean>
+  <bean name="atg.commerce.csr.returns.ReturnItem" default-filter="summary">
+    <filter id="summary">
+      <property name="commerceItemId" target="commerceItem.id" />
+    </filter>
+    <filter id="detailed">
+      <property name="returnItemId" target="id" />
+      <property name="commerceItem" filter-id="summary" />
+      <property name="quantityToExchange" />
+      <property name="quantityReturned" />
+      <property name="refundAmount" />
+      <property name="quantityToReturn" />
+      <property name="quantityReturned" />
+      <property name="returnReason" />
+      <property name="shippingGroupId" />
+    </filter>
+  </bean>
+</bean-filtering>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/config/atg/dynamo/service/filter/bean/beanFilteringConfiguration.xml#2 $$Change: 856578 $-->

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE gsa-template SYSTEM "dynamosystemresource:/atg/dtds/gsa/gsa_1.0.dtd">
+<gsa-template>
+<import-items>
+
+<!-- Adjust the content propertyViewMapping so it uses a plain text editor instead of the default HTML editor -->
+
+<add-item item-descriptor="propertyViewMapping" id="aMgrPvmEditCRSPlainTextTemplate">
+  <set-property name="description"><![CDATA[Commerce Reference Store text template editor]]></set-property>
+  <set-property name="propertyView"><![CDATA[AmPvBigStrPlain]]></set-property>
+</add-item>
+
+<add-item item-descriptor="itemViewMapping" id="aMgrIvmEditStoreAnnouncementText">
+  <set-property name="name"><![CDATA[AssetManager store announcement text  itemViewMapping]]></set-property>
+  <set-property name="displayName"><![CDATA[aMgrIvmEditStoreAnnouncementText.displayName]]></set-property>
+  <set-property name="view"><![CDATA[aMgrIvCRSText]]></set-property>
+  <set-property name="propertyMappings"><![CDATA[content=aMgrPvmEditCRSPlainTextTemplate]]></set-property>
+  <set-property name="attributeValues"><![CDATA[resourceBundle=aMgrAvCrsResourceBundle]]></set-property>
+</add-item>
+
+<add-item item-descriptor="itemMapping" id="aMgrImEditStoreAnnouncementText">
+  <set-property name="name"><![CDATA[AssetManager]]></set-property>
+  <set-property name="description"><![CDATA[Store Announcements itemMapping]]></set-property>
+  <set-property name="mode"><![CDATA[AmMmDef]]></set-property>
+  <set-property name="itemPath"><![CDATA[/atg/store/stores/StoreTextRepository]]></set-property>
+  <set-property name="itemName"><![CDATA[storeAnnouncement]]></set-property>
+  <set-property name="formHandler"><![CDATA[crsAmFh]]></set-property>
+  <set-property name="viewMappings"><![CDATA[aMgrIvmEditStoreAnnouncementText]]></set-property>
+  <set-property name="attributes"><![CDATA[resourceBundle=aMgrAvCrsResourceBundle]]></set-property>
+</add-item>
+
+</import-items>
+
+</gsa-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/Versioned/data/viewmapping.xml#1 $$Change: 846311 $-->

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template default-chain-id="getCurrentCatalog"
+  xsi:noNamespaceSchemaLocation="http://www.atg.com/xsds/actorChain_1.0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <!--  This chain is used to set the current catalog -->
+  <actor-chain id="setCurrentCatalog" transaction="TX_SUPPORTS">
+    <form id="changeCatalogForm" name="/atg/commerce/custsvc/environment/ChangeCatalogAndPriceList" var="changeCatalogForm" handle="changeEnvironment" use-forwards="false">
+      <input name="inputParameters.catalogId" value="${param.catalogId}"/>
+
+      <input name="errorURL" value="/rest/model/atg/commerce/custsvc/environment/EnvironmentActor/setCurrentCatalog-error"/>
+      <input name="successURL" value="/rest/model/atg/commerce/custsvc/environment/EnvironmentActor/setCurrentCatalog-success"/>
+    </form>
+  </actor-chain>
+
+  <!-- There's no need to return anything here -->
+  <actor-chain id="setCurrentCatalog-success" transaction="TX_SUPPORTS">
+  </actor-chain>
+
+  <!-- Forward to the error chain, and return any errors in the form handler -->
+  <actor-chain id="setCurrentCatalog-error" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/commerce/custsvc/environment/EnvironmentActor/" chain-id="error" return-model-var="model">
+      <output id="error" add-map-children="true" value="${model}"/>
+    </actor>
+  </actor-chain>
+
+  <!--  This chain is used to retrieve the current catalog -->
+  <actor-chain id="getCurrentCatalog" transaction="TX_SUPPORTS">
+    <component id="catalogHolder" name="/atg/commerce/custsvc/environment/CurrentCatalogHolder" component-var="catalogHolder">
+      <output id="currentCatalog" name="currentCatalog" value="${catalogHolder.currentCatalog}"/>
+    </component>
+  </actor-chain>
+
+  <!--  This chain is used to set the current price list -->
+  <actor-chain id="setCurrentPriceList" transaction="TX_SUPPORTS">
+    <form id="changePriceListForm" name="/atg/commerce/custsvc/environment/ChangeCatalogAndPriceList" var="changePriceListForm" handle="changeEnvironment" use-forwards="false">
+      <input name="inputParameters.priceListId" value="${param.priceListId}"/>
+
+      <input name="errorURL" value="/rest/model/atg/commerce/custsvc/environment/EnvironmentActor/setCurrentPriceList-error"/>
+      <input name="successURL" value="/rest/model/atg/commerce/custsvc/environment/EnvironmentActor/setCurrentPriceList-success"/>
+    </form>
+  </actor-chain>
+
+  <!-- There's no need to return anything here -->
+  <actor-chain id="setCurrentPriceList-success" transaction="TX_SUPPORTS">
+  </actor-chain>
+
+  <!-- Forward to the error chain, and return any errors in the form handler -->
+  <actor-chain id="setCurrentPriceList-error" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/commerce/custsvc/environment/EnvironmentActor/" chain-id="error" return-model-var="model">
+      <output id="error" add-map-children="true" value="${model}"/>
+    </actor>
+  </actor-chain>
+
+  <!--  This chain is used to retrieve the current price list -->
+  <actor-chain id="getCurrentPriceList" transaction="TX_SUPPORTS">
+    <component id="priceListHolder" name="/atg/commerce/custsvc/environment/CurrentPriceListHolder" component-var="priceListHolder">
+      <output id="currentPriceList" name="currentPriceList" value="${priceListHolder.currentPriceList}"/>
+    </component>
+  </actor-chain>
+
+  <!--  This chain is used to set the current price list -->
+  <actor-chain id="setCurrentSalePriceList" transaction="TX_SUPPORTS">
+    <form id="changePriceListForm" name="/atg/commerce/custsvc/environment/ChangeCatalogAndPriceList" var="changePriceListForm" handle="changeEnvironment" use-forwards="false">
+      <input name="inputParameters.salePriceListId" value="${param.priceListId}"/>
+
+      <input name="errorURL" value="/rest/model/atg/commerce/custsvc/environment/EnvironmentActor/setCurrentSalePriceList-error"/>
+      <input name="successURL" value="/rest/model/atg/commerce/custsvc/environment/EnvironmentActor/setCurrentSalePriceList-success"/>
+    </form>
+  </actor-chain>
+
+  <!-- There's no need to return anything here -->
+  <actor-chain id="setCurrentSalePriceList-success" transaction="TX_SUPPORTS">
+  </actor-chain>
+
+  <!-- Forward to the error chain, and return any errors in the form handler -->
+  <actor-chain id="setCurrentSalePriceList-error" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/commerce/custsvc/environment/EnvironmentActor/" chain-id="error" return-model-var="model">
+      <output id="error" add-map-children="true" value="${model}"/>
+    </actor>
+  </actor-chain>
+
+  <!--  This chain is used to retrieve the current price list -->
+  <actor-chain id="getCurrentSalePriceList" transaction="TX_SUPPORTS">
+    <component id="priceListHolder" name="/atg/commerce/custsvc/environment/CurrentPriceListHolder" component-var="priceListHolder">
+      <output id="currentPriceList" name="currentPriceList" value="${priceListHolder.currentSalePriceList}"/>
+    </component>
+  </actor-chain>
+
+  <!-- Outputs errors from the ChangeCatalogAndPriceList form handler.  This chain is only suitable for errors from chain that use that form handler
+       i.e. setCurrentPriceList and setCurrentCatalog -->
+  <actor-chain id="error" transaction="TX_SUPPORTS">
+    <component id="changeCatalogAndPriceList-error" name="/atg/commerce/custsvc/environment/ChangeCatalogAndPriceList" component-var="changeCatalogAndPriceList">
+      <output id="formError" name="formError" value="${changeCatalogAndPriceList.formError}"/>
+      <output id="formExceptions" name="formExceptions" value="${changeCatalogAndPriceList.formExceptions}"/>
+    </component>
+  </actor-chain>
+
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/commerce/custsvc/environment/environmentActor.xml#2 $$Change: 822448 $ -->

@@ -1,0 +1,7 @@
+{
+    "matchmode": "MATCHPHRASE",
+    "keyword": "Style by Zhanna",
+    "inherit": "FALSE",
+    "sling:resourceType": "endeca/trigger",
+    "jcr:primaryType": "endeca:unstructured"
+}

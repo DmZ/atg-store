@@ -1,0 +1,27 @@
+<actor-template>
+
+<!-- Change the current customer to a new anonymous profile -->
+ <actor-chain id="newCustomer" transaction="TX_SUPPORTS">
+    <form id="newCustomerFormHandler" name="/atg/svc/agent/ui/formhandlers/ChangeCurrentCustomer"
+          var="newCustomerFormHandler" handle="changeEnvironment">
+      <input name="environmentChangeKey" value="newCustomer"/>
+      <input name="doWarnings" value="${param.doWarnings}"/>
+      <input name="doTicketDispositionPrompt" value="${param.doTicketDispositionPrompt}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.dispositionOption" value="${param.dispositionOption}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.reasonCode" value="${param.reasonCode}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.ticketNote" value="${param.ticketNote}"/>
+      <input name="environmentChangeState.ticketDispositionOptions.publicNote" value="${param.publicNote}"/>
+
+      <input name="errorURL" value="${errorURL != null ? errorURL : '/model/atg/svc/agent/ui/formhandlers/ChangeCurrentCustomerActor/selectCustomer-error'}"/>
+      <input name="successURL" value="${successURL != null ? successURL : '/model/atg/svc/agent/ui/formhandlers/ChangeCurrentCustomerActor/selectCustomer-success'}"/>
+      <input name="confirmURL" value="${confirmURL != null ? confirmURL : '/model/atg/svc/agent/ui/formhandlers/ChangeCurrentCustomerActor/selectCustomer-confirm'}"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="selectCustomer-success" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/userprofiling/ActiveCustomerProfileActor" chain-id="summary" return-model-var="profile">
+      <output id="profile" add-map-children="true" value="${profile}"/>
+    </actor>
+  </actor-chain>
+
+</actor-template>

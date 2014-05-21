@@ -1,0 +1,52 @@
+<actor-template>
+   <actor-chain id="commitOrder">
+    <form id="commitOrderFormHandler">
+      <!-- Some extra inputs to enable the new order confirmation email, and to configure the sales channel and site. --> 
+      <input name="salesChannel" value="mobile"/>
+      <input name="allowEmptyOrders" value="false" />
+      <input name="siteId" value="${nucleus['/atg/svc/agent/environment/CurrentSiteHolder'].currentSite.id}" />
+    </form>
+  </actor-chain>
+
+  <actor-chain id="persistOrder">
+    <form id="commitOrderFormHandler">
+      <input name="commitOrderUpdatesSuccessURL" value="/model/atg/commerce/custsvc/order/CommitOrderActor/persistOrder-success"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="persistOrder-success">
+    <actor id="resetShippingGroups" name="/atg/commerce/custsvc/order/ShippingGroupActor" chain-id="resetShippingGroups"/>
+    <actor id="shoppingCart" name="/atg/commerce/custsvc/order/ShoppingCartActor" chain-id="detailed" return-model-var="model">
+      <output id="shoppingCart" name="order" value="${model.order}"/>
+    </actor>
+  </actor-chain>
+
+  <!-- This chain sends an order confirmation email.  It should be called after the order has been submitted, since it
+       is configured to use the last submitted order, not the current cart. -->
+  <actor-chain id="sendOrderConfirmationEmail">
+    <component id="confirmationInfo" name="/atg/commerce/custsvc/order/ConfirmationInfo"
+      component-var="confirmationInfo">
+      <input name="profile" value="${nucleus['/atg/userprofiling/ActiveCustomerProfile']}" />
+      <input name="order" value="${nucleus['/atg/commerce/custsvc/order/ShoppingCart'].last}" />
+      <input name="toEmailAddress" value="${param.emailAddress}"/>
+      <input name="autoConfirmationEmailAddress" value="${param.emailAddress}" />
+      <input name="templateName" value="NEW_ORDER" />
+      <input name="customerDisplayLocale" value="${nucleus['/atg/commerce/custsvc/util/CSRAgentTools'].activeCustomerDisplayLocale}" />
+    </component>
+
+    <form id="commitOrderFormHandlerEmail" name="/atg/commerce/custsvc/order/CommitOrderFormHandler" handle="sendConfirmationMessage" var="commitOrderFormHandlerEmail">
+      <input name="commitOrderUpdatesErrorURL" value="${commitOrderUpdatesErrorURL != null ? commitOrderUpdatesErrorURL : '/model/atg/commerce/custsvc/order/CommitOrderActor/commitOrderUpdates-error'}"/>
+      <input name="commitOrderUpdatesSuccessURL" value="${commitOrderUpdatesSuccessURL != null ? commitOrderUpdatesSuccessURL : '/model/atg/commerce/custsvc/order/CommitOrderActor/commitOrderUpdates-success'}"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="commitOrderUpdates-error" transaction="TX_SUPPORTS">
+    <actor id="error" name="/atg/commerce/custsvc/order/CommitOrderActor" chain-id="error" return-model-var="model">
+     <output id="model" add-map-children="true" value="${model}"/>
+    </actor>
+  </actor-chain>
+  <actor-chain id="commitOrderUpdates-success" transaction="TX_SUPPORTS">
+  </actor-chain>
+
+
+</actor-template>

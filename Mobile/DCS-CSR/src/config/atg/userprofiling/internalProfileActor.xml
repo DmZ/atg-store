@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/userprofiling/internalProfileActor.xml#4 $$Change: 830278 $-->
+<actor-template>
+
+  <actor-chain id="login">
+    <form id="loginFH" name="/atg/agent/userprofiling/AgentProfileFormHandler"  handle="login" var="loginFH" use-forwards="false">
+    </form>
+  </actor-chain>
+
+  <actor-chain id="login-success">
+    <!-- add the user's locale to the response --> 
+    <component id="internalProfile">
+      <output id="locale" name="locale" value="${internalProfile.locale}"/>
+    </component>
+  </actor-chain>
+
+  <actor-chain id="logout">
+    <form id="logoutFH" name="/atg/agent/userprofiling/AgentProfileFormHandler" handle="logout" var="logoutFH">
+      <input name="logoutErrorURL" value="/rest/model/atg/userprofiling/InternalProfileActor/logout-error"/>
+      <input name="logoutSuccessURL" value="/rest/model/atg/userprofiling/InternalProfileActor/logout-success"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="error" transaction="TX_SUPPORTS">
+    <component id="internalProfileFormHandler-error" name="/atg/agent/userprofiling/AgentProfileFormHandler" component-var="internalProfileFormHandler">
+      <output id="formError" name="formError" value="${internalProfileFormHandler.formError}"/>
+      <output id="formExceptions" name="formExceptions" value="${internalProfileFormHandler.formExceptions}"/>
+    </component>
+  </actor-chain>
+
+  <actor-chain id="info">
+    <component id="profile" name="/atg/userprofiling/Profile" component-var="profile"/>
+    <output id="profile" name="profile" value="${profile.dataSource}" filter-id="short"/>
+  </actor-chain>
+
+  <actor-chain id="updateLocale" transaction="TX_SUPPORTS">
+    <component id="internalProfile" name="/atg/userprofiling/Profile" component-var="internalProfile">
+      <input name="locale" value="${param.locale}"/>
+    </component>  
+  </actor-chain>
+
+</actor-template>

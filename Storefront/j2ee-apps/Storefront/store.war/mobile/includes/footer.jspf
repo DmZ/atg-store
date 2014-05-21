@@ -1,0 +1,35 @@
+<%--
+  Footer fragment of the page.
+  This fragment is used to end the page. It works in pair with "header.jspf".
+  It's included by the "mobilePageContainer" custom tag.
+
+  NOTES:
+    1) The "mobileStorePrefix", "mobileImagesPrefix" request-scoped variables (request attributes), which are used here,
+       are defined in the "mobilePageContainer" tag ("mobilePageContainer.tag" file).
+       These variable become available within the <crs:mobilePageContainer> ... </crs:mobilePageContainer> block
+       and in all the included pages (gadgets and Endeca cartridges).
+--%>
+<footer>
+  <nav>
+  <ul>
+    <li onclick="CRSMA.mobilepage.showContactUsPage()">
+      <a href="javascript:void(0);"><span><fmt:message key="mobile.common.button.contactUs"/></span></a>
+    </li>
+    <li class="dividerBar"><br/></li>
+    <li>
+      <dsp:a page="${mobileStorePrefix}/company/stores.jsp"><span><fmt:message key="mobile.pageFooter.button.stores"/></span></dsp:a>
+    </li>
+    <li class="dividerBar"><br/></li>
+    <li>
+      <dsp:a page="${mobileStorePrefix}/company/moreInfo.jsp"><span><fmt:message key="mobile.pageFooter.button.more"/><fmt:message key="mobile.common.ellipsis"/></span></dsp:a>
+    </li>
+  </ul>
+  </nav>
+  <div class="footerCopyright">
+    <dsp:a page="${mobileStorePrefix}/company/terms.jsp">
+      <p><fmt:message key="mobile.pageFooter.copyright"/></p>
+      <img src="${mobileImagesPrefix}icon-arrowRIGHT.png" alt=""/>
+    </dsp:a>
+  </div>
+</footer>
+<%-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Storefront/j2ee/store.war/mobile/includes/footer.jspf#7 $$Change: 801227 $ --%>

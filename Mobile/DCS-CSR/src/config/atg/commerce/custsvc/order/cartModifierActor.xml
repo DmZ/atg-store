@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actor-template>
+  <!-- Override the success URLs in this chains -->
+  <actor-chain id="addItemToOrder">
+    <form id="cartModifierFormHandler">
+      <input name="shippingGroupNickname" value="${param.shippingGroupNickname}"/>
+      <input name="originOfOrder" value="mobile"/>
+      <input name="addItemToOrderSuccessURL" value="/model/atg/commerce/custsvc/order/ShoppingCartActor/shoppingCartAndCommerceItemIds"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="addMultipleItemsToOrder">
+    <form id="cartModifierFormHandler">
+      <input name="items[].originOfOrder" value="mobile" array-size="${param.addItemCount}"/>
+      <input name="addMultipleItemsToOrderSuccessURL" value="${addMultipleItemsToOrderSuccessURL != null ? addMultipleItemsToOrderSuccessURL : '/model/atg/commerce/custsvc/order/ShoppingCartActor/detailed'}"/>
+    </form>
+  </actor-chain>
+
+  <!-- params: removalCommerceIds, commerceItemId=shippingGroupId -->
+  <!-- e.g. to remove commerce item ci1002 from shipping group sg1001, use the parameters:
+            removalCommerceIds=[ci1002]
+            ci1002=sg1001          
+  -->
+  <actor-chain id="removeItemsFromOrderByShippingGroupId" transaction="TX_SUPPORTS">
+    <form id="cartModifierFormHandler" name="/atg/commerce/custsvc/order/CartModifierFormHandler" var="cartModifierFormHandler" handle="removeItemFromOrderByRelationshipId">
+      <input name="removalCommerceIds" value="${param.removalCommerceIds}">
+        <tag-converter class-name="atg.droplet.ArrayTagConverter"/>
+      </input>
+      <input name="removeItemFromOrderByRelationshipIdErrorURL" value="/model/atg/commerce/custsvc/order/CartModifierActor/removeItemFromOrder-error"/>
+      <input name="removeItemFromOrderByRelationshipIdSuccessURL" value="/model/atg/commerce/custsvc/order/CartModifierActor/removeItemFromOrder-success"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="mergeOrder">
+   <input name="orderIdToCancel" value="${param.orderIdToCancel}"/>
+   <actor id="addMultipleItemsToOrder" name="/atg/commerce/custsvc/order/CartModifierActor" chain-id="addMultipleItemsToOrder">
+     <input name="addMultipleItemsToOrderSuccessURL" value="/model/atg/commerce/custsvc/order/CartModifierActor/mergeOrder-success"/>
+   </actor>
+  </actor-chain>
+
+  <actor-chain id="mergeOrder-success" transaction="TX_SUPPORTS">   
+    <input name="orderIdToCancel" value="${orderIdToCancel != null ? orderIdToCancel : param.orderIdToCancel}"/>  
+    <actor id="deleteOrder" name="/atg/commerce/custsvc/order/CancelOrderActor" chain-id="cancelOrder">
+      <input name="cancelOrderSuccessURL" value="/model/atg/commerce/custsvc/order/ShoppingCartActor/detailed"/>
+    </actor>
+  </actor-chain>
+
+  <actor-chain id="removeAndAddItemToOrder">
+    <form id="cartModifierFormHandler">
+      <input name="shippingGroupNickname" value="${param.shippingGroupNickname}"/>
+      <input name="locationId" value="${param.locationId}"/>
+      <input name="originOfOrder" value="mobile"/>
+      <input name="removeAndAddItemToOrderSuccessURL" value="/model/atg/commerce/custsvc/order/ShoppingCartActor/detailed"/>
+    </form>
+  </actor-chain>
+
+  <actor-chain id="removeItemFromOrder-success">
+    <actor id="orderDetails" name="/atg/commerce/custsvc/order/ShoppingCartActor"
+              chain-id="detailed" return-model-var="model">
+      <output id="model" add-map-children="true" value="${model}"/>
+     </actor>
+  </actor-chain>
+
+</actor-template>
+<!-- @version $Id: //hosting-blueprint/B2CBlueprint/version/10.2.1/Mobile/DCS-CSR/config/atg/commerce/custsvc/order/cartModifierActor.xml#11 $$Change: 848728 $ -->
