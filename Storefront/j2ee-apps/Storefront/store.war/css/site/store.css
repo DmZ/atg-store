@@ -60,7 +60,7 @@ a:active{
 #atg_store_contentContainer{
   padding: 0px 30px 30px 30px;
   margin: 0 15px 0 15px;
-  background: #FFF;
+  background: #501;
 }
 #atg_store_content{
   background: #fff url(/crsdocroot/content/images/atgstore/content_gradient_bg.gif) repeat-x bottom center;
@@ -275,7 +275,7 @@ Note:  3 Column Layout is only used on Order Details Page.
 /* 1.3 - Category Navigation
 ----------------------------------------------------------*/
 #atg_store_catNavContainer{
-  background: #555C58 url(/crsdocroot/content/images/atgstore/cat_nav_bg.png) repeat-x top center;
+  background: #ff0000 url(/crsdocroot/content/images/atgstore/cat_nav_bg.png) repeat-x top center;
   bottom:-40px;
   left:53px;
   position:absolute;
